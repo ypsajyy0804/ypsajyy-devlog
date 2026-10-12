@@ -6,6 +6,7 @@
 
 | 目录 / 文件 | 内容 | 更新频率 |
 |---|---|---|
+| [daily/](daily/) | **每日施工单**（`.docx`）。「今天具体做什么」的答案 | 每天 |
 | [progress.md](progress.md) | 每周打卡表 + 会话日志 + 连续打卡天数 | 每周日 |
 | [exercises/](exercises/) | 每周练习清单。**「不知道写什么」的解药** | 每周 |
 | [code/](code/) | 我手写的代码（按语言分目录） | 每天 |
@@ -34,5 +35,6 @@
 
 **大三上 W3** ｜ 阶段 A 地基期 ｜ C 语言 + Linux 上手 + 线性表
 
+→ 今天做什么：[daily/](daily/) 里最新那份 `.docx`
 → 详细状态见 [progress.md](progress.md)
 → 这周的题目见 [exercises/2026-W03.md](exercises/2026-W03.md)

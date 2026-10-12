@@ -13,6 +13,8 @@
 *.go   text eol=lf
 
 # 二进制文件：不做换行转换，不做 diff
+# 注：docx/xlsx 本体是 zip 包，_make.py 生成时时间戳固定，同样内容 = 同样字节
+*.docx binary
 *.xlsx binary
 *.png  binary
 *.jpg  binary

@@ -39,6 +39,7 @@
 
 ## 现在 · [present/](present/)
 
+- [每日施工单](present/daily/) —— **每天一份 `.docx`：今天做哪几道题、每道多久、怎么算过**
 - [进度追踪](present/progress.md) —— 每周打卡 + 调试记录
 - [练习清单](present/exercises/) —— 每周题目。**我最大的卡点是「不知道写什么」，这里是解药**
 - [代码](present/code/) —— 我手写的，不是复制来的
