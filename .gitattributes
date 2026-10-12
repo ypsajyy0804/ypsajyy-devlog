@@ -1,0 +1,20 @@
+# 默认：仓库内存 LF，检出时 Windows 转 CRLF
+* text=auto
+
+# shell 脚本必须保持 LF —— CRLF 会让脚本在 Linux 上直接跑不起来
+*.sh   text eol=lf
+*.bash text eol=lf
+
+# C / C++ / Go 源码统一 LF
+*.c    text eol=lf
+*.h    text eol=lf
+*.cpp  text eol=lf
+*.hpp  text eol=lf
+*.go   text eol=lf
+
+# 二进制文件：不做换行转换，不做 diff
+*.xlsx binary
+*.png  binary
+*.jpg  binary
+*.pdf  binary
+*.zip  binary

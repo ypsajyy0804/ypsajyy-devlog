@@ -1,0 +1,53 @@
+# ---- 编译产物 ----
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+a.out
+*.gcda
+*.gcno
+*.dSYM/
+
+# ---- 构建目录 ----
+build/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+Makefile.in
+
+# ---- Go ----
+*.test
+*.prof
+
+# ---- 编辑器 / IDE ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-*
+*~
+
+# ---- 操作系统 ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- 环境变量与密钥：绝对不要提交 ----
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+secrets/
+credentials*
+
+# ---- 临时文件 ----
+*.tmp
+*.bak
+*.log
+!journal/*.md
