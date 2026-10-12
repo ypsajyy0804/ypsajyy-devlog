@@ -1,10 +1,10 @@
 # W{周次} 练习清单 · {起止日期}
 
-> 复制这份模板生成新的一周。规则见 `ROADMAP.md` §1 与 `CLAUDE.md` §2/§3。
+> 复制这份模板生成新的一周。规则见 [`future/roadmap.md`](../../future/roadmap.md) §1 与 [`CLAUDE.md`](../../CLAUDE.md) §2/§3。
 
 ## 本周焦点
 
-<!-- 从 ROADMAP.md 对应周次抄过来，但要翻译成"能直接开工"的题目 -->
+<!-- 从 future/roadmap.md 对应周次抄过来，但要翻译成"能直接开工"的题目 -->
 
 - 主题：
 - 上周欠账：
@@ -48,8 +48,8 @@
 
 ## 做完之后
 
-- 更新 `PROGRESS.md`
-- 卡住的概念记进 `journal/`
+- 更新 [`progress.md`](../progress.md)
+- 卡住的概念记进 [`journal/`](../journal/)
 - 拿代码来审
 
 **下周预告**：

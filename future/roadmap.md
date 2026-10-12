@@ -3,10 +3,10 @@
 > 起算日：**2026-09-28（周一）**｜周投入：**20 小时**
 > 终局目标：2028 届秋招，C++ / Linux / Go / 云原生 / 基础设施 / 中间件 / 数据库 / AI Infra / 高性能网络 / 服务器开发
 >
-> **配套文件**：[`README.md`](README.md) 仓库总览 · [`PROGRESS.md`](PROGRESS.md) 打卡与日志 · [`exercises/`](exercises/) 每周练习题 · [`docs/self-assessment.md`](docs/self-assessment.md) 能力自评
+> **配套文件**：[`README.md`](../README.md) 仓库总览 · [`progress.md`](../present/progress.md) 打卡与日志 · [`exercises/`](../present/exercises/) 每周练习题 · [`self-assessment.md`](../past/self-assessment.md) 能力自评 · [`past/`](../past/) 做过的项目
 >
 > ⚠️ 本文件的周任务是**主题级**的（例如「数组：内存布局、越界后果」）。它不是能直接开工的指令。
-> **真正动手的题目在 [`exercises/`](exercises/) 里。**
+> **真正动手的题目在 [`exercises/`](../present/exercises/) 里。**
 
 ---
 
@@ -46,7 +46,7 @@
 
 **每周汇总**：C 6h ｜ 数据结构 4h ｜ Linux 4h ｜ Java 4h ｜ 网络/OS 2h = **20h** ✓
 
-**每个主题日开工前，先打开 [`exercises/`](exercises/) 里本周的清单**，照着题目写。清单没覆盖到的，自己加。写完拿来审（流程见 [`CLAUDE.md`](CLAUDE.md) §3）。
+**每个主题日开工前，先打开 [`exercises/`](../present/exercises/) 里本周的清单**，照着题目写。清单没覆盖到的，自己加。写完拿来审（流程见 [`CLAUDE.md`](../CLAUDE.md) §3）。
 
 > **红线 1**：这 20 小时**不含**课内作业和课程复习。期末周（W15-W16）允许砍到 8h/周，但**不许断**——断了就再也起不来。
 >
