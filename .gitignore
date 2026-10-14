@@ -12,6 +12,20 @@ a.out
 *.gcno
 *.dSYM/
 
+# ---- MSVC / Visual Studio 的中间文件 ----
+# (.pdb 单个就有 7MB，.ilk 3MB —— 绝对不能进公开仓库)
+*.ilk
+*.pdb
+*.idb
+*.exp
+*.lib
+*.suo
+*.sdf
+*.opendb
+*.VC.db
+*.recipe
+
+
 # ---- 构建目录 ----
 build/
 cmake-build-*/
@@ -51,3 +65,7 @@ credentials*
 *.bak
 *.log
 !journal/*.md
+
+# ---- Office 打开文件时生成的锁文件 ----
+# 用 Word 打开 daily/*.docx 就会冒出 ~$xxxx.docx，里面是用户名，别提交
+~$*
