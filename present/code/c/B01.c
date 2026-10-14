@@ -10,9 +10,9 @@ int main() {
 	printf("%p\n", s2);
 
 	s1[0] = 'H';
-	//s2[0] = 'H';
+	s2[0] = 'H';
 	printf("%s\n", s1);
-	//printf("%s\n", s2);
+	printf("%s\n", s2);
 
 	return 0;
 }
