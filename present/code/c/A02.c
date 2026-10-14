@@ -5,7 +5,7 @@ int main() {
   printf("%ld\n",sizeof(short));      //2
   printf("%ld\n",sizeof(int));        //4
   printf("%ld\n",sizeof(long long));  //8
-  printf("%ld\n",sizeof(long));       //4
+  printf("%ld\n",sizeof(long));       //8
   printf("%ld\n",sizeof(float));      //4
   printf("%ld\n",sizeof(double));     //8
   printf("%ld\n",sizeof(size_t));     //8
