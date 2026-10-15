@@ -4,7 +4,7 @@ int main() {
   int a = 0, b = 0, c = 0;
   printf("请输入三个整数：");
   scanf("%d %d %d", &a, &b, &c);
-  if(a < b && a < c) {
+  if(a <= b && a <= c) {
     printf("%d ", a);
     if(b < c) {
       printf("%d ", b);
@@ -13,7 +13,7 @@ int main() {
       printf("%d ", c);
       printf("%d\n", b);
     }
-  }else if(b < a && b < c){
+  }else if(b <= a && b <= c){
     printf("%d ", b);
     if(a < c){
       printf("%d ", a);
