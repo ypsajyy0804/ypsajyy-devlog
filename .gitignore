@@ -69,3 +69,7 @@ credentials*
 # ---- Office 打开文件时生成的锁文件 ----
 # 用 Word 打开 daily/*.docx 就会冒出 ~$xxxx.docx，里面是用户名，别提交
 ~$*
+
+# ---- Python ----
+__pycache__/
+*.pyc
