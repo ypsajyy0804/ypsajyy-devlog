@@ -73,3 +73,6 @@ credentials*
 # ---- Python ----
 __pycache__/
 *.pyc
+
+# ---- Word 打开 docx 时的锁文件 ----
+~$*.docx
