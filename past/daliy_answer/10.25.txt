@@ -1,0 +1,151 @@
+任务一：
+打印结果：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -g -Wall -Wextra -Werror -o ./build/vector vector.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ ./build/vector
+初始数组：
+1
+2
+3
+4
+插入 9 :
+1
+2
+9
+3
+4
+删除一个元素：
+2
+9
+3
+4
+capacity = 100, size = 0
+
+
+任务二：
+利用 Valgrind 工具检测内存问题：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -g -Wall -Wextra -Werror -o ./build/vector vector.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ valgrind --leak-check=full --show-leak-kinds=all ./build/vector
+==44367== Memcheck, a memory error detector
+==44367== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==44367== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==44367== Command: ./build/vector
+==44367==
+初始数组：
+1
+2
+3
+4
+插入 9 :
+1
+2
+9
+3
+4
+删除一个元素：
+2
+9
+3
+4
+capacity = 100, size = 0
+==44367==
+==44367== HEAP SUMMARY:
+==44367==     in use at exit: 0 bytes in 0 blocks
+==44367==   total heap usage: 3 allocs, 3 frees, 1,444 bytes allocated
+==44367==
+==44367== All heap blocks were freed -- no leaks are possible
+==44367==
+==44367== For lists of detected and suppressed errors, rerun with: -s
+==44367== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+故意把 vec_free() 函数里的 free(v->data) 注释掉，编译后用 valgrind 检测：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -g -Wall -Wextra -Werror -o ./build/vector vector.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ valgrind --leak-check=full --show-leak-kinds=all ./build/vector
+==44980== Memcheck, a memory error detector
+==44980== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==44980== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==44980== Command: ./build/vector
+==44980==
+初始数组：
+1
+2
+3
+4
+插入 9 :
+1
+2
+9
+3
+4
+删除一个元素：
+2
+9
+3
+4
+capacity = 100, size = 0
+==44980==
+==44980== HEAP SUMMARY:
+==44980==     in use at exit: 420 bytes in 2 blocks
+==44980==   total heap usage: 3 allocs, 1 frees, 1,444 bytes allocated
+==44980==
+==44980== 20 bytes in 1 blocks are definitely lost in loss record 1 of 2
+==44980==    at 0x48487A9: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==44980==    by 0x1093F6: vec_reserve (vector.c:59)
+==44980==    by 0x1096DF: main (vector.c:127)
+==44980==
+==44980== 400 bytes in 1 blocks are definitely lost in loss record 2 of 2
+==44980==    at 0x48487A9: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==44980==    by 0x1093F6: vec_reserve (vector.c:59)
+==44980==    by 0x10985C: main (vector.c:153)
+==44980==
+==44980== LEAK SUMMARY:
+==44980==    definitely lost: 420 bytes in 2 blocks
+==44980==    indirectly lost: 0 bytes in 0 blocks
+==44980==      possibly lost: 0 bytes in 0 blocks
+==44980==    still reachable: 0 bytes in 0 blocks
+==44980==         suppressed: 0 bytes in 0 blocks
+==44980==
+==44980== For lists of detected and suppressed errors, rerun with: -s
+==44980== ERROR SUMMARY: 2 errors from 2 contexts (suppressed: 0 from 0)
+
+valgrind 内存泄露 420 个字节，共来自两块内存区域：HEAP SUMMARY:
+==44980==     in use at exit: 420 bytes in 2 blocks
+==44980==   total heap usage: 3 allocs, 1 frees, 1,444 bytes allocated
+通过代码可以推理：
+第一块内存：vec_reserve(p, 5) 调用函数后，申请到 4(int) x 5 = 20 个字节；
+第二块内存：vec_reserve(q, 100) 调用函数后，申请到 4(int) x 100 = 400 个字节；
+由于 p->data 与 q->data 均为释放，mian 函数放回后  valgrind 已经对 p，q 指针不可达，找不到两块内存区的地址，相当于丢失了共 400 + 20 = 420 个字节；
+
+关于 definitely lost 与 still reachable：
+definitely lost 是明确的内存泄漏，still reachable 则表示程序结束时内存仍未释放，但仍存在可追踪的指针引用。 前者由于失去了指向动态内存的有效引用，程序无法再通过正常途径释放它；后者则表示程序结束时内存仍未释放，但仍存在可追踪的指针引用。
+
+另外我发现一个问题，请你给我解答：
+不论 free(v->data) 有没有注释掉，HEAP SUMMARY 里都会都会多报一个 allocs(分配次数) 和 frees(释放次数)，看我的代码：
+allocs 应该只有两出：vec_reserve(p, 5)、vec_reserve(q, 100) 调用 vec_reserve 各跑一次 realloc()，但实际 valgrind 里记录了 3 次；free 代码里应该只在 vec_free() 里，free(p) free(q) 各调用一次，应该是两次，而 free(v->data) 未注释掉时报的是 free 3 次，注释掉时报的是 1 次；
+请给我解答一下；
+
+
+任务三：
+打印结果：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -g -Wall -Wextra -Werror -o ./build/checkpoint_W4 checkpoint_W4.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ ./build/checkpoint_W4
+1->2->9->3->4
+2->9->3->4
+4->3->9->2
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ valgrind --leak-check=full --show-leak-kinds=all ./build/checkpoint_W4
+==84012== Memcheck, a memory error detector
+==84012== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==84012== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==84012== Command: ./build/checkpoint_W4
+==84012==
+1->2->9->3->4
+2->9->3->4
+4->3->9->2
+==84012==
+==84012== HEAP SUMMARY:
+==84012==     in use at exit: 0 bytes in 0 blocks
+==84012==   total heap usage: 6 allocs, 6 frees, 1,104 bytes allocated
+==84012==
+==84012== All heap blocks were freed -- no leaks are possible
+==84012==
+==84012== For lists of detected and suppressed errors, rerun with: -s
+==84012== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

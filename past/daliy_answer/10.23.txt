@@ -1,0 +1,182 @@
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/java$ ls
+Hello.java
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/java$ javac Hello.java
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/java$ ls
+Hello.class  Hello.java
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/java$ java Hello
+hi
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/java$ java Hello.class
+Error: Could not find or load main class Hello.class
+Caused by: java.lang.ClassNotFoundException: Hello.class
+
+java 命令后面通常填写的是类名，而不是 .class 文件名，它用来开启 JVM 虚拟机运行 .class 文件
+
+任务一：
+
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/java$ javac Order.java
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/java$ java Order
+[a]
+a() = 1
+b() = 2
+[c]
+c() catchx
+d() catchy
+
+1.b 中 try 和 finally 都试图决定方法最终返回数字，finally 说了算；因为 finally 执行时，可能改变原本准备返回的结果
+
+2.[c] 打印了，不论 try 里的代码块是否发生异常，都会先执行 finally 里的代码，再向外传播异常/返回某个结果；当然， finally 执行时，可能改变原本准备返回的结果；
+
+3.最后抛出的异常是 finally 里的 “throw new RuntimeException("y")”；d() 中 try 原本准备返回 1，但因为 finally 里的异常会抢先往外传播，1 不在正常返回；
+
+任务二：
+			   Throwable (可抛出的)
+                		    /              \
+         Error (系统级错误)        Exception (程序级异常)
+                		                   /              \
+       			RuntimeException		Checked Exception
+			 (运行时异常) 				(受检异常)
+NullPointerException 属于 Exception 这一支里 RuntimeException 下的一个异常，编译器不强制要求 catch RuntimeException/运行时异常；
+
+Error OutOfMemoryError（内存溢出错误 - OOM），一直创建对象、不回收，最终导致 head 被占满：
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class OOMDemo {
+    public static void main(String[] args) {
+        try {
+            List<byte[]> list = new ArrayList<>();
+            int count = 0;
+            
+            while (true) {
+                // 每次循环创建一个 1MB 的字节数组，并加入到列表中
+                list.add(new byte[1024 * 1024]); 
+                count++;
+                System.out.println("已成功申请内存次数: " + count);
+            }
+            
+        } catch (Throwable t) {
+            System.out.println("捕获到了内存溢出: " + t);
+        }
+    }
+}
+
+Error 不应该被回收，不像 Exception 那种程序还能继续活下去的意外，Error 会直接导致整个程序或底层环境已经彻底崩溃或无法挽回，程序已经是不可恢复的瘫痪状态；即便利用父类  Throwable catch/捕获后，也无法实现程序后续的正常运行；
+
+temp.java：
+public class temp {
+    public static void main(String[] args) {
+        try {
+            throw new RuntimeException();
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }catch(RuntimeException e){
+            System.out.println(e.getMessage());
+        }
+    }
+}
+
+编译：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/java$ javac temp.java
+temp.java:7: error: exception RuntimeException has already been caught
+        }catch(RuntimeException e){
+         ^
+1 error
+
+编译失败，原因是连续的 catch 不能以这种父类在前子类在后从大到小的形式，因为前面的父类必定能把后面子类能够捕获的异常都拦截，后面的子类 catch 代码块永远不会执行，成了死代码，这在 java 上是不被允许的
+然而从小到大的形式是被允许的
+
+temp.java：
+public class temp {
+    public static void main(String[] args) {
+        try {
+            throw new RuntimeException();
+        }catch(RuntimeException e){
+            System.out.println(e.getMessage());
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+}
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/java$ javac temp.java
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/java$ java temp
+null
+编译、运行成功
+从小到大的形式，前面的子类比一定会拦截所有异常，未拦截的异常可让后面的父类 catch 兜底
+
+任务3：
+你没有说清楚是构建一个纯 Maven 项目还是一个 集成 Maven 的 Springboot项目，
+我这里是纯 Maven 项目
+并且，你给我的代码没用启动类
+导致 mvn spring-boot:run 报错：
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  47.755 s
+[INFO] Finished at: 2026-10-23T10:45:30+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.2.0:run (default-cli) on project book-demo: Unable to find a suitable main class, please add a 'mainClass' property -> [Help 1]                                                                                                                                                      
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+
+
+我手动添加了一个启动类：D:\Claude_code\职业规划导师\present\code\java\projacts\book-demo\src\main\java\com\environment\test\main.java
+让然后 mvn spring-boot:run
+
+PS D:\Claude_code\职业规划导师\present\code\java\projacts\book-demo> mvn spring-boot:run
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< com.environment:book-demo >----------------------
+[INFO] Building book-demo 1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.2.0:run (default-cli) > test-compile @ book-demo >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ book-demo ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ book-demo ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 1 source file with javac [debug release 17] to target\classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ book-demo ---
+[INFO] skip non existing resourceDirectory D:\Claude_code\职业规划导师\present\code\java\projacts\book-demo\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ book-demo ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] 
+[INFO] <<< spring-boot:3.2.0:run (default-cli) < test-compile @ book-demo <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.2.0:run (default-cli) @ book-demo ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.0)
+
+2026-10-23T11:08:36.358+08:00  INFO 7392 --- [           main] com.environment.test.main                : Starting main using Java 21.0.10 with PID 7392 (D:\Claude_code\鑱屼笟瑙勫垝瀵煎笀\present\code\java\projacts\book-demo\target\classes started by Xmf in D:\Claude_code\鑱屼笟瑙勫垝瀵煎笀\present\code\java\projacts\book-demo)
+2026-10-23T11:08:36.358+08:00  INFO 7392 --- [           main] com.environment.test.main                : No active profile set, falling back to 1 default profile: "default"
+2026-10-23T11:08:37.423+08:00  WARN 7392 --- [           main] o.m.s.mapper.ClassPathMapperScanner      : No MyBatis mapper was found in '[com.environment.test]' package. Please check your configuration.
+2026-10-23T11:08:38.243+08:00  INFO 7392 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-10-23T11:08:38.273+08:00  INFO 7392 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-23T11:08:38.273+08:00  INFO 7392 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.16]
+2026-10-23T11:08:38.494+08:00  INFO 7392 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-10-23T11:08:38.494+08:00  INFO 7392 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2056 ms
+2026-10-23T11:08:39.256+08:00  INFO 7392 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path ''
+2026-10-23T11:08:39.260+08:00  INFO 7392 --- [           main] com.environment.test.main                : Started main in 3.589 seconds (process running for 4.201)
+启动成功
+
+注意倒数第三行，“Tomcat started on port 8080 (http) with context path”成功打印 Tomcat started on port 8080
+
+MySQL 安装在 windoes 里

@@ -1,0 +1,115 @@
+80
+12
+4
+
+int：4 字节
+int matrix[3][4];
+3 x 4 = 12
+12 x 4 = 48
+
+int*：8 字节
+int* ptr_arr[3]
+8 x 3 = 24
+
+int (*)[4]：8 字节
+
+
+定向学习
+int matrix[3][4];
+3 x 4 = 12
+12 x 4 = 48
+
+指针数组：int* ptr_arr[3];
+一个数组，里面有三个元素，每个元素都是大小为 8 的指针类型
+3 x 8 = 24
+
+数组指针：int (*arr_ptr)[4];
+一个指针，指向一个含有包含 4 个元素的数组
+在 x64 ubuntu 中，指针的大小为 8
+
+任务1：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -g -Wall -Wextra -o ./build/P06 P06.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ ./build/P06
+p = 0x7ffd6bd84930
+p + 1 = 0x7ffd6bd84934
+(p + 1) - p = 4
+row = 0x7ffd6bd84930
+row + 1 = 0x7ffd6bd84940
+(row + 1) - row = 16
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ ./build/P06
+p = 0x7ffe9c968860
+p + 1 = 0x7ffe9c968864
+(p + 1) - p = 4
+row = 0x7ffe9c968860
+row + 1 = 0x7ffe9c968870
+(row + 1) - row = 16
+
+matrix 本身的类型是 int [3][4]，也就是「包含 3 个元素的数组，每个元素又是一个 int[4] 数组」；在表达式中会转换为指向第一行的指针，类型为 int (*)[4]；
+matrix[0] 表示数组第一行，本身类型是 int[4]，在表达式中会转换为指向首元素的指针，是 int* 类型
+matrix[0][0] 表示第一行第一个元素，是 int 类型
+
+p 做为普通指针，为 int* 类型，它指向数组中首元素的地址，步长为 4，p + 1 地址位加 4
+row 做为数组指针，为 int (*)[4] 类型，它指向整个数组的地址，步长为 4 x 4 = 16，row + 1 地址位加 16
+指针加 1，加的是步长；
+
+任务二：
+2.1
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ grep -n "malloc" vector.c
+18:    v->data = malloc(sizeof(int));
+20:      printf("malloc failed\n");
+30:    int* new_data = malloc(sizeof(int) * new_capacity);
+32:      printf("malloc failed\n");
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ grep -c "malloc" vector.c
+4
+-n 显示匹配行在原文件中的行号（line number），-c 表示：统计有多少行匹配，差在一个显示行号，一个统计有多少行；
+
+2.2
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ grep "free" vector.c | wc -l
+5
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ ls -l | grep '\.c$' | wc -l
+20
+第二条：ls -l：目录条目的详细文本列表——> grep '\.c$'：筛选出名称以 .c 结尾的条目——> 接收经过筛选的文本行，并统计行数
+你要求“不是"结果"，说清是哪种东西”，这种问题太抽象、太难以揣测你的意思，在是靠要正面回答就会浪费我一大笔时间，我只能想到这样回答：左边命令写入标准输出（stdout）的文本数据，通过管道成为右边命令的标准输入（stdin）
+
+2.3
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ grep -rn "free(" .
+./B05.c:38:  free(p1);
+./B05.c:39:  free(p2);
+./B05.c:40:  free(p3);
+./B06.c:38:      free(temp);
+./checkpoint_W4.c:32:    free(temp);
+./checkpoint_W4.c:39:    free(temp);
+./checkpoint_W4.c:54:void node_free(Node* head) {
+./checkpoint_W4.c:58:    free(cur);
+./checkpoint_W4.c:92:  node_free(head);
+./P04b.c:7:  free(q);
+./temp.c:16:void vec_free(Vec* v){
+./temp.c:17:  free(v->data);
+./temp.c:28:  // vec_free(p);
+./temp.c:29:  free(p);
+./V03.c:58:  free(v->data);
+./V03.c:62:  free(v);
+./V04.c:82:  free(v->data);
+./V04.c:83:  free(v);
+./vector.c:39:    free(v->data);
+./vector.c:48:void vec_free(Vec* v){
+./vector.c:49:  free(v->data);
+./vector.c:156:  vec_free(p);
+./vector.c:157:  vec_free(q);
+. 在这里指当前目录
+
+我把原 P06.c 的 “  int *p = matrix[0];    /* 指向一个 int */”中指针的 int* 类型改为 double* 类型
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -Wall -o ./build/bad P06.c 2> err.txt
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ wc -l err.txt
+6 err.txt
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -Wall -o ./build/bad P06.c 2>> err.txt
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ wc -l err.txt
+12 err.txt
+第一次 ws -l 显示文件有 6 行，第二次显示有 12 行；
+> 号是覆盖式重定向，直接替换文本里的内容；
+>> 号是追加式重定向，不删除原文本内容，将新内容追加到原文本末尾；
+Linux 进程通常有三个标准文件描述符（standard file descriptors）：
+0	标准输入（stdin）
+1	标准输出（stdout）
+2	标准错误（stderr）
+这里需要把 gcc 编译的警告/报错覆盖写入文本，用 标准错误描述符 2，也就是‘2>’如果直接使用 ‘>’默认使用标准输出描述符 1，不符合情景

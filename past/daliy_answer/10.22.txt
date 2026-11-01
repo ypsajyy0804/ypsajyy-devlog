@@ -1,0 +1,106 @@
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ ./build/asan_demo
+=================================================================
+==243==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7fff673dc83c at pc 0x5ea25ec2f3a0 bp 0x7fff673dc800 sp 0x7fff673dc7f0
+WRITE of size 4 at 0x7fff673dc83c thread T0
+    #0 0x5ea25ec2f39f in main /mnt/d/Claude_code/职业规划导师/present/code/c/asan_demo.c:4
+    #1 0x7fe1de029d8f in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #2 0x7fe1de029e3f in __libc_start_main_impl ../csu/libc-start.c:392
+    #3 0x5ea25ec2f164 in _start (/mnt/d/Claude_code/职业规划导师/present/code/c/build/asan_demo+0x1164)
+
+Address 0x7fff673dc83c is located in stack of thread T0 at offset 44 in frame
+    #0 0x5ea25ec2f238 in main /mnt/d/Claude_code/职业规划导师/present/code/c/asan_demo.c:2
+
+  This frame has 1 object(s):
+    [32, 44) 'a' (line 3) <== Memory access at offset 44 overflows this variable
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /mnt/d/Claude_code/职业规划导师/present/code/c/asan_demo.c:4 in main
+Shadow bytes around the buggy address:
+  0x10006ce738b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10006ce738c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10006ce738d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10006ce738e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10006ce738f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x10006ce73900: 00 00 f1 f1 f1 f1 00[04]f3 f3 00 00 00 00 00 00
+  0x10006ce73910: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10006ce73920: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10006ce73930: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10006ce73940: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10006ce73950: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+  Shadow gap:              cc
+==243==ABORTING
+
+1.ERROR: AddressSanitizer: stack-buffer-overflow 指错误类型为：栈上缓存区内存越界
+2.四字节：99为 int 类型的数据，占空间大小为 4 字节，意思是写了 4 字节
+3.指向：a[3] = 99; 越界发生在这行
+
+另外，这段报错值得关注的地方还有这些：
+WRITE of size 4 at 0x7fff673dc83c 中的 0x7fff673dc83c 是内存越界的 具体内存地址
+
+This frame has 1 object(s):
+    [32, 44) 'a' (line 3) <== Memory access at offset 44 overflows this variable
+[32, 44) 是相对于函数调用栈帧的数组地址范围，44 - 32 = 3 x 4 = 12 字节，后半句意为：内存访问偏移量 44 处，变量发生越界
+
+另外的影子内存（Shadow address）我没有专门去学习
+
+任务1：
+main 里的sizeof(a) 输出的是 a 数组占用的字节大小：int 类型大小为 4，数组长度为 5，4 x 5 = 20；
+函数 f 中的sizeof(a) 输出的是指针 int* a 的大小：在函数参数声明中，形如 int a[5] 的数组参数，会被调整为 int *a；这与 C 语言的函数参数采用的设计有关，传递数组时，通常通过首元素地址访问数组，而不是把整个数组做为函数参数传递
+
+任务2：
+P04a:
+==259==ERROR: AddressSanitizer: heap-use-after-free on address 0x507000000020 at pc 0x5737a9ac61cc bp 0x7fff80a8f7f0 sp 0x7fff80a8f7e0
+P04b:
+==265==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x6073ae6f7226 bp 0x7ffcee7d6d60 sp 0x7ffcee7d6d50
+光看 ASan 报错的第一行是看不出两种错误的区别的，报的错误类型都是 heap-use-after-free：堆内存释放后使用，因为 ASan 主要检查的是内存访问是否违反了内存区域的状态和边界规则，它不会直接知道变量 p 就是“野指针”，专门检测未初始化值使用的工具是 MemorySanitizer（MSan）；
+然而我可以扣一些细节：
+对比两者释放内存调用栈
+P04a 的释放内存调用栈中没有 main 函数！：
+freed by thread T0 here:
+    #0 0x7a03a54b4537 in __interceptor_free ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:127
+    #1 0x7a03a508ffb9 in dl_error_free dlerror.h:54
+    #2 0x7a03a508ffb9 in dl_action_result_errstring_free dlerror.h:72
+    #3 0x7a03a508ffb9 in dl_action_result_errstring_free dlerror.h:65
+    #4 0x7a03a508ffb9 in __dlerror dlfcn/dlerror.c:95
+而 P04b 中有：
+freed by thread T0 here:
+    #0 0x74c978eb4537 in __interceptor_free ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:127
+    #1 0x6073ae6f71ee in main /mnt/d/Claude_code/职业规划导师/present/code/c/P04b.c:7
+    #2 0x74c978a29d8f in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+第七行：free(q);
+这出细节可以给出一些提示：P04a.c 没有释放过内存的行为，b 中有，进而可以推测 a 中可能是解引用未初始化指针的问题，而 b 中就是 heap-use-after-free：堆内存释放后使用
+
+另外，不用 Asan 编译，a 运行报段错误，b 运行什么都不发生：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -o ./build/P04a P04a.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ ./build/P04a
+Segmentation fault (core dumped)
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -o ./build/P04b P04b.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ ./build/P04b
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$
+至于为什么 P04b 在不开 sanitizer 时什么都不发生，可能的原因是 free(p) 后内存页没有直接被删除，因为释放内存不等于立刻从进程的虚拟地址空间中撤销这块内存对应的页面，如果对应页面仍然可写，处理器可能成功执行 *p = 10 这次写入，即使如此，这个操作依然是未定义行为。
+
+任务三：
+指针变量 p 保存了 int 变量 x 的内存地址，bad(p); 调用 bad 函数之后，p = NULL，传入的指针变量 p 转而变成一个“空指针”（这是 mian 函数里的指针变量 p 的一个副本，而不是  mian 函数里真正的指针变量 p），mian 函数里的指针变量 p 依旧指向 x，p 本身的值不是 NULL，所以 p ? "非 NULL" : "NULL" 表示为 "非NULL"；
+接着指针变量 q 又保存了 int 变量 x 的内存地址，传入 good 函数的参数为 &q，即指针变量 q 本身值的地址（不是 x 的地址，并且这个 q 本身值的地址也是一个副本），此时 good 函数中的形参 *pp 表示为 *(&q)，直接利用 main 函数里 q 本身值的地址的副本，找到了 main 函数里真正的 q 本地的值，这不等于往 good 函数里传入保存了 int 变量 x 内存地址的指针变量 q 的副本；*pp 为 q ，*pp = NULL 就是把 main 函数里真正的 q  本身的值改为 NULL，此时 mian 函数的指针变量 q 变成空指针，所以 q ? "非 NULL" : "NULL" 应该表示为 "NULL";
+综上，bad 函数改的是 main 函数里 p 指针的一个副本值，main 函数的 p 指针的值不变；
+
+在 B06 里，insert 函数的形参：(Node* head, int pos, int val)，其中传入的 Node* head 同样也是 mian 函数里真正结构体指针 head 的一个副本值，而不是  mian 函数里的 head 值，所以 insert 函数定义返回 head 的副本值，再 main 函数里把副本值 赋值给 真正的 head；如果 insert 的返回值为 void，没有放回值，那么正在的 head 值不会改变，如果往链表的表头插入元素就会出错。

@@ -1,0 +1,17 @@
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -g -Wall -Wextra -o build/temp temp.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ ./build/temp
+4 1 8
+
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -g -Wall -Wextra -o build/temp temp.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ ./build/temp
+p     = 0x7ffd27b85c50
+p + 1 = 0x7ffd27b85c54
+差值  = 4
+
+p + 1 增加的大小与 p 指向的数据类型（ int ）有关，int 类型占的字节大小为 4，p + 1 增加 4 个字节，这叫做“步长”为 4；
+
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -g -Wall -Wextra -o build/temp temp.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ ./build/temp
+30 30 30
+
+指针与数组的性质，决定了 a[2] 等价于 *(a + 2)，而加法交换律决定 *(a + 2)等价于 *(2 + a)，所以 *(2 + a)等价于a[2]，最终输出结果均为 30

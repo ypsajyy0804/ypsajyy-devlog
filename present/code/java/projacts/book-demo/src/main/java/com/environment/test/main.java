@@ -17,17 +17,17 @@ public class main {
         System.out.println("启动成功");
     }
 
-    @Bean
-    CommandLineRunner dbCheck(DataSource ds) {
-        return args -> {
-            try (Connection c = ds.getConnection();
-                 Statement st = c.createStatement();
-                 ResultSet rs = st.executeQuery("SELECT @@port, DATABASE(), VERSION()")) {
-                rs.next();
-                System.out.println("probe: port=" + rs.getInt(1)
-                        + " db=" + rs.getString(2)
-                        + " version=" + rs.getString(3));
-            }
-        };
-    }
+//    @Bean
+//    CommandLineRunner dbCheck(DataSource ds) {
+//        return args -> {
+//            try (Connection c = ds.getConnection();
+//                 Statement st = c.createStatement();
+//                 ResultSet rs = st.executeQuery("SELECT @@port, DATABASE(), VERSION()")) {
+//                rs.next();
+//                System.out.println("probe: port=" + rs.getInt(1)
+//                        + " db=" + rs.getString(2)
+//                        + " version=" + rs.getString(3));
+//            }
+//        };
+//    }
 }

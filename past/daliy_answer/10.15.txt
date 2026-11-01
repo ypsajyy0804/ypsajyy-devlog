@@ -1,0 +1,117 @@
+10.15
+任务一：
+
+ypsajyy@LAPTOP-UA13PBC7:/mnt/c/Users/Xmf$ cd /mnt/d/Claude_code/职业规划导师
+/present/code/c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -g -Wall -Wextra -Werror -o build/B01 B01.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gdb
+./build/B01
+GNU gdb (Ubuntu 12.1-0ubuntu1~22.04.2) 12.1
+Copyright (C) 2022 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./build/B01...
+(gdb) run
+Starting program: /mnt/d/Claude_code/职业规划导师/present/code/c/build/B01
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+6
+8
+0x7fffffffd8c2
+0x555555556004
+
+Program received signal SIGSEGV, Segmentation fault.
+0x000055555555522c in main () at B01.c:13
+13              s2[0] = 'H';
+(gdb) bt
+#0  0x000055555555522c in main () at B01.c:13
+(gdb) info proc mappings
+process 3067
+Mapped address spaces:
+
+          Start Addr           End Addr       Size     Offset  Perms  objfile
+      0x555555554000     0x555555555000     0x1000        0x0  r--p   /mnt/d/Claude_code/职业规划导师/present/code/c/build/B01
+      0x555555555000     0x555555556000     0x1000     0x1000  r-xp   /mnt/d/Claude_code/职业规划导师/present/code/c/build/B01
+      0x555555556000     0x555555557000     0x1000     0x2000  r--p   /mnt/d/Claude_code/职业规划导师/present/code/c/build/B01
+      0x555555557000     0x555555558000     0x1000     0x2000  r--p   /mnt/d/Claude_code/职业规划导师/present/code/c/build/B01
+      0x555555558000     0x555555559000     0x1000     0x3000  rw-p   /mnt/d/Claude_code/职业规划导师/present/code/c/build/B01
+      0x555555559000     0x55555557a000    0x21000        0x0  rw-p   [heap]
+      0x7ffff7c00000     0x7ffff7c28000    0x28000        0x0  r--p   /usr/lib/x86_64-linux-gnu/libc.so.6
+      0x7ffff7c28000     0x7ffff7dbd000   0x195000    0x28000  r-xp   /usr/lib/x86_64-linux-gnu/libc.so.6
+      0x7ffff7dbd000     0x7ffff7e15000    0x58000   0x1bd000  r--p   /usr/lib/x86_64-linux-gnu/libc.so.6
+      0x7ffff7e15000     0x7ffff7e16000     0x1000   0x215000  ---p   /usr/lib/x86_64-linux-gnu/libc.so.6
+      0x7ffff7e16000     0x7ffff7e1a000     0x4000   0x215000  r--p   /usr/lib/x86_64-linux-gnu/libc.so.6
+      0x7ffff7e1a000     0x7ffff7e1c000     0x2000   0x219000  rw-p   /usr/lib/x86_64-linux-gnu/libc.so.6
+      0x7ffff7e1c000     0x7ffff7e29000     0xd000        0x0  rw-p
+      0x7ffff7fab000     0x7ffff7fae000     0x3000        0x0  rw-p
+      0x7ffff7fb9000     0x7ffff7fbb000     0x2000        0x0  rw-p
+      0x7ffff7fbb000     0x7ffff7fbf000     0x4000        0x0  r--p   [vvar]
+      0x7ffff7fbf000     0x7ffff7fc1000     0x2000        0x0  r--p   [vvar_vclock]
+      0x7ffff7fc1000     0x7ffff7fc3000     0x2000        0x0  r-xp   [vdso]
+      0x7ffff7fc3000     0x7ffff7fc5000     0x2000        0x0  r--p   /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+      0x7ffff7fc5000     0x7ffff7fef000    0x2a000     0x2000  r-xp   /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+      0x7ffff7fef000     0x7ffff7ffa000     0xb000    0x2c000  r--p   /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+      0x7ffff7ffb000     0x7ffff7ffd000     0x2000    0x37000  r--p   /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+      0x7ffff7ffd000     0x7ffff7fff000     0x2000    0x39000  rw-p   /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+      0x7ffffffdd000     0x7ffffffff000    0x22000        0x0  rw-p   [stack]
+(gdb) p s2
+$1 = 0x555555556004 "hello"
+(gdb) p &s1
+$2 = (char (*)[6]) 0x7fffffffd8c2
+(gdb) p &s2
+$4 = (char **) 0x7fffffffd8b8
+1.bt 的第一帧（#0）指向 B01.c 的第13行，1帧，因为只有一个main函数的调用
+2.0x7ffffffdd000     0x7ffffffff000    0x22000        0x0  rw-p   [stack]
+以及
+0x555555556000     0x555555557000     0x1000     0x2000  r--p   /mnt/d/Claude_code/职业规划导师/present/code/c/build/B01
+这两行；
+3.差在w，s1数组的内存地址权限为rw-p，可写；指针 s2 指向的字符串内存地址权限为r--p，不可写；而那个段错误正是因为修改指针 s2 指向的字符串，写入了不可写入的内存，触发不存在的w权限错误；
+4.去掉-g后编译，bt指令不会返回行号，因为此时编译器不会生成供 GDB 调试使用的调试信息
+
+任务二
+1.我预计打印 出来都是4，实际编译时就出错：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -Wall -Wextra -Werror -o build/A02 A02.c
+A02.c: In function ‘main’:
+A02.c:19:12: error: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘long unsigned int’ [-Werror=format=]
+   19 |   printf("%d\n", sizeof(int));
+      |           ~^     ~~~~~~~~~~~
+      |            |     |
+      |            int   long unsigned int
+      |           %ld
+cc1: all warnings being treated as errors
+因为“-Werror”的存在，所有warning都被当成error，所以我直接：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -Wall -Wextra -o build/A02 A02.c
+A02.c: In function ‘main’:
+A02.c:19:12: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘long unsigned int’ [-Wformat=]
+   19 |   printf("%d\n", sizeof(int));
+      |           ~^     ~~~~~~~~~~~
+      |            |                   |
+      |            int   long unsigned int
+      |           %ld
+注意，其实这条警告也不完全对，sizeof(int)应该是size_t类型，为什么报是long unsigned int？
+2.你在文档里说“哪一行是对的？另外两行错在哪”，我认为你是错误的，实际只有一个是错的，另两个都对；我的看法：
+sizeof(int)本身是size_t类型，标准占位符应该是%zu，第一个没问题；而第二个在其前面增加了（long）这个强制转型，成了long类型，用%ld对；第三个不正确；
+3.我根本预期不出来是什么，实际打印出：705032704，研究了一下，发现它是5000000000这个数的二进制表示的低32位数对应的十进制数：
+00000000     00000000     00000000     00000001      00101010    00000101    11110000    00000000
+└──────────── 高 32 位 ───────────┘   └──────────── 低 32 位 ───────────┘
+
+任务3
+写在D:\Claude_code\职业规划导师\present\code\c里了，编译后的文件在build文件夹，测了可行
+
+任务是4
+写在notes文件夹了
+
+
+另外我还有要吐槽的
+我记得我的最终目标不是多线多线并行达成的任务吗？怎么感觉这几天只在学和C有关的东西？我觉得你之前给我的计划表是每天都有不同主线的学习啊？而且感觉你这两天让我学的东西全是些“软知识”，我的编程硬实力是一点没提高，也就让写了个简简单单的A04还是最基础的if/else嵌套；总之还是太小儿科了；还有就是我发现我这两天学到的东西，没有那种用文字总结出来的具有高可阅读性、可复习性的笔记（我自己写得太烂了），建议你根据我的作业完成内容以及我的笔记，增理一下，错的改正，每天并帮我总结成docx文档，是我在闲暇时可阅读；

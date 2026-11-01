@@ -1,0 +1,116 @@
+ypsajyy@LAPTOP-UA13PBC7:~$ curl -v --noproxy '*' 172.24.48.1:8080/health
+*   Trying 172.24.48.1:8080...
+* Connected to 172.24.48.1 (172.24.48.1) port 8080 (#0)
+> GET /health HTTP/1.1
+> Host: 172.24.48.1:8080
+> User-Agent: curl/7.81.0
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200
+< Content-Type: text/plain;charset=UTF-8
+< Content-Length: 2
+< Date: Thu, 29 Oct 2026 08:49:26 GMT
+<
+* Connection #0 to host 172.24.48.1 left intact
+ok
+
+更改 ResponseEntity 调用的方法：
+ypsajyy@LAPTOP-UA13PBC7:~$ curl -v --noproxy '*' 172.24.48.1:8080/health
+*   Trying 172.24.48.1:8080...
+* Connected to 172.24.48.1 (172.24.48.1) port 8080 (#0)
+> GET /health HTTP/1.1
+> Host: 172.24.48.1:8080
+> User-Agent: curl/7.81.0
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 404
+< Content-Length: 0
+< Date: Thu, 29 Oct 2026 08:51:36 GMT
+<
+* Connection #0 to host 172.24.48.1 left intact
+状态码变成 404，表示请求的资源不存在，body 为空
+
+任务1：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -g -Wall -Wextra -Werror -o ./build/C01 C01.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ ./build/C01
+1->2->3->4
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ valgrind --leak-check=full ./build/C01
+==15143== Memcheck, a memory error detector
+==15143== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==15143== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==15143== Command: ./build/C01
+==15143==
+1->2->3->4==15143==
+==15143== HEAP SUMMARY:
+==15143==     in use at exit: 0 bytes in 0 blocks
+==15143==   total heap usage: 5 allocs, 5 frees, 1,088 bytes allocated
+==15143==
+==15143== All heap blocks were freed -- no leaks are possible
+==15143==
+==15143== For lists of detected and suppressed errors, rerun with: -s
+==15143== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+注释掉四次 push
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -g -Wall -Wextra -Werror -o ./build/C01 C01.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ ./build/C01
+循环列表为空
+
+1.指向它自己：tail->next = tail;
+2.因为循环链表使用尾指针，可以在 O(1) 时间内完成尾插操作，不需要遍历链表。
+假设链表有 n 个节点：
+使用尾指针 tail：直接通过 tail->next 找到头节点，再修改原尾节点的 next，插入新节点，更新 tail。总共只需要固定次数的指针操作，时间复杂度为 O(1)。
+使用头指针 head：每次 push_back 都要从头节点开始，沿着 next 遍历，直到找到尾节点，再插入新节点。需要遍历 n 个节点，时间复杂度为 O(n)。
+
+任务二：
+ypsajyy@LAPTOP-UA13PBC7:~$ curl -v --noproxy '*' -X POST "172.24.48.1:8080/book?title=CProgramming&author=me"
+*   Trying 172.24.48.1:8080...
+* Connected to 172.24.48.1 (172.24.48.1) port 8080 (#0)
+> POST /book?title=CProgramming&author=me HTTP/1.1
+> Host: 172.24.48.1:8080
+> User-Agent: curl/7.81.0
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200
+< Content-Type: text/plain;charset=UTF-8
+< Content-Length: 2
+< Date: Sat, 31 Oct 2026 08:57:48 GMT
+<
+1
+* Connection #0 to host 172.24.48.1 left intact
+ypsajyy@LAPTOP-UA13PBC7:~$ curl -v --noproxy '*' 172.24.48.1:8080/book/1
+*   Trying 172.24.48.1:8080...
+* Connected to 172.24.48.1 (172.24.48.1) port 8080 (#0)
+> GET /book/1 HTTP/1.1
+> Host: 172.24.48.1:8080
+> User-Agent: curl/7.81.0
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200
+< Content-Type: application/json
+< Transfer-Encoding: chunked
+< Date: Sat, 31 Oct 2026 08:59:11 GMT
+<
+* Connection #0 to host 172.24.48.1 left intact
+{"id":1,"title":"CProgramming","author":"me"}ypsajyy@LAPTOP-UA13PBC7:~$ curl -v --noproxy '*' http://172.24.48.1:8080/book/99                      curl -v --noproxy '*' http://172.24.48.1:8080/book/99
+*   Trying 172.24.48.1:8080...
+* Connected to 172.24.48.1 (172.24.48.1) port 8080 (#0)
+> GET /book/99 HTTP/1.1
+> Host: 172.24.48.1:8080
+> User-Agent: curl/7.81.0
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 404
+< Content-Length: 0
+< Date: Sat, 31 Oct 2026 09:00:30 GMT
+<
+* Connection #0 to host 172.24.48.1 left intact
+
+Spring MVC 内部有专门的返回值处理器，会根据 Controller 的返回类型选择不同的处理方式。
+- 返回普通对象（如 Book）：框架通过 HttpMessageConverter 将对象转换为 JSON，默认使用 HTTP 200 状态码。
+- 返回 ResponseEntity：框架通过 HttpEntityMethodProcessor 解析其中的状态码、响应头和响应体，并按照指定状态码构建 HTTP 响应。
+因此，修改返回类型后，Spring 会采用不同的处理机制，从而允许开发者自行控制 HTTP 状态码。

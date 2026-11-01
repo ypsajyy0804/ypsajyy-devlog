@@ -1,0 +1,286 @@
+三类含义：属主 用户组 其他人
+-rw-r--r--：chmod 644
+-rwx------：chmod 700
+
+任务一
+写得B06.c通过了7组的测试
+第二组 insert(head, 0, 9); 的修改顺序：
+在我的insert函数了，首先会把‘9’这个参数赋值给新建指针newnode指向的值，传入的 pos 被判定为 0 后，新指针的后继节点指向原 head，并把新指针 newnode 赋值给原传入的 head 指针；接着回到 main 函数，insert 函数返回的 head 指针会赋值给链表原 head 指针，完成修改。
+
+任务二
+ypsajyy@LAPTOP-UA13PBC7:~$ mkdir -p lab
+ypsajyy@LAPTOP-UA13PBC7:~$ ls
+fisco  lab  workspace
+ypsajyy@LAPTOP-UA13PBC7:~$ cd lab
+ypsajyy@LAPTOP-UA13PBC7:~/lab$ vim hello.sh
+ypsajyy@LAPTOP-UA13PBC7:~/lab$ ./hello.sh
+-bash: ./hello.sh: Permission denied
+ypsajyy@LAPTOP-UA13PBC7:~/lab$ ls -l hello.sh
+-rw-r--r-- 1 ypsajyy ypsajyy 20 Oct 18 11:30 hello.sh
+ypsajyy@LAPTOP-UA13PBC7:~/lab$ chmod +x hello.sh
+ypsajyy@LAPTOP-UA13PBC7:~/lab$ ls -l hello.sh
+-rwxr-xr-x 1 ypsajyy ypsajyy 20 Oct 18 11:30 hello.sh
+ypsajyy@LAPTOP-UA13PBC7:~/lab$ ./hello.sh
+hi
+ypsajyy@LAPTOP-UA13PBC7:~/lab$ chmod 700 hello.sh
+ypsajyy@LAPTOP-UA13PBC7:~/lab$ ls -l hello.sh
+-rwx------ 1 ypsajyy ypsajyy 20 Oct 18 11:30 hello.sh
+
+报错“Permission denied”权限拒绝，没有执行‘x’的权限；
+chmod +x，给予了三类人可执行权限，改了第一列的3、6、9位，加上了x
+
+任务三
+调试经过：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -g -Wall -Wextra -Werror -o build/B05 B05.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ ./build/B05
+100
+200
+300
+100
+200
+100
+300
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gdb ./build/B05
+GNU gdb (Ubuntu 12.1-0ubuntu1~22.04.2) 12.1
+Copyright (C) 2022 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./build/B05...
+(gdb) break main
+Breakpoint 1 at 0x1195: file B05.c, line 11.
+(gdb) run
+Starting program: /mnt/d/Claude_code/职业规划导师/present/code/c/build/B05
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Breakpoint 1, main () at B05.c:11
+11        Node* p1 = malloc(sizeof(Node));
+(gdb) next
+12        Node* p2 = malloc(sizeof(Node));
+(gdb) next
+13        Node* p3 = malloc(sizeof(Node));
+(gdb) next
+15        if(p1 == NULL || p2 == NULL || p3 == NULL)
+(gdb) next
+18        p1->data =100;  //等价于（*p1）.data = 100;
+(gdb) next
+19        p2->data = 200;
+(gdb) next
+20        p3->data = 300;
+(gdb) next
+22        p1->next = p2;
+(gdb) next
+23        p2->next = p3;
+(gdb) next
+24        p3->next = NULL;
+(gdb) next
+27        p2->prev = p1;
+(gdb) next
+28        p3->prev = p2;
+(gdb) next
+30        printf("%d\n", p1->data);
+(gdb) p p2->prev
+$1 = (struct Node *) 0x5555555592a0
+(gdb) p p1
+$2 = (Node *) 0x5555555592a0
+(gdb) p p1->prev
+$3 = (struct Node *) 0x0
+(gdb) p p3->next
+$4 = (struct Node *) 0x0
+(gdb) exit
+A debugging session is active.
+
+        Inferior 1 [process 392] will be killed.
+
+Quit anyway? (y or n) y
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -g -Wall -Wextra -Werror -o build/B05 B05.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gdb ./build/B05
+GNU gdb (Ubuntu 12.1-0ubuntu1~22.04.2) 12.1
+Copyright (C) 2022 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./build/B05...
+(gdb) break main
+Breakpoint 1 at 0x1195: file B05.c, line 11.
+(gdb) run
+Starting program: /mnt/d/Claude_code/职业规划导师/present/code/c/build/B05
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Breakpoint 1, main () at B05.c:11
+11        Node* p1 = malloc(sizeof(Node));
+(gdb) next
+12        Node* p2 = malloc(sizeof(Node));
+(gdb) next
+13        Node* p3 = malloc(sizeof(Node));
+(gdb) next
+15        if(p1 == NULL || p2 == NULL || p3 == NULL)
+(gdb) next
+18        p1->data =100;  //等价于（*p1）.data = 100;
+(gdb)
+19        p2->data = 200;
+(gdb) next
+20        p3->data = 300;
+(gdb) next
+22        p1->next = p2;
+(gdb) next
+23        p2->next = p3;
+(gdb) next
+24        p3->next = NULL;
+(gdb) next
+26        p1->prev = NULL;
+(gdb) next
+27        p2->prev = p1;
+(gdb) next
+28        p3->prev = p2;
+(gdb) next
+30        printf("%d\n", p1->data);
+(gdb) p p1->prev
+$1 = (struct Node *) 0x0
+(gdb) p*(p1->prev)
+Cannot access memory at address 0x0
+(gdb) p *(p1->prev)
+Cannot access memory at address 0x0
+(gdb) p *(p1->next)
+$2 = {data = 200, next = 0x5555555592e0, prev = 0x5555555592a0}
+(gdb) exit
+A debugging session is active.
+
+        Inferior 1 [process 418] will be killed.
+
+Quit anyway? (y or n) y
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -g -Wall -Wextra -Werror -o build/A02 A02.c
+A02.c: In function ‘main’:
+A02.c:19:12: error: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘long unsigned int’ [-Werror=format=]
+   19 |   printf("%d\n", sizeof(int));
+      |           ~^     ~~~~~~~~~~~
+      |            |     |
+      |            int   long unsigned int
+      |           %ld
+A02.c:28:12: error: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘long unsigned int’ [-Werror=format=]
+   28 |   printf("%d\n", (size_t)5000000000);
+      |           ~^     ~~~~~~~~~~~~~~~~~~
+      |            |     |
+      |            int   long unsigned int
+      |           %ld
+cc1: all warnings being treated as errors
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -g -Wall -Wextra -o build/A02 A02.c
+A02.c: In function ‘main’:
+A02.c:19:12: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘long unsigned int’ [-Wformat]
+   19 |   printf("%d\n", sizeof(int));
+      |           ~^     ~~~~~~~~~~~
+      |            |     |
+      |            int   long unsigned int
+      |           %ld
+A02.c:28:12: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘long unsigned int’ [-Wformat]
+   28 |   printf("%d\n", (size_t)5000000000);
+      |           ~^     ~~~~~~~~~~~~~~~~~~
+      |            |     |
+      |            int   long unsigned int
+      |           %ld
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gdb ./build/A02
+GNU gdb (Ubuntu 12.1-0ubuntu1~22.04.2) 12.1
+Copyright (C) 2022 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./build/A02...
+(gdb) break main
+Breakpoint 1 at 0x1155: file A02.c, line 4.
+(gdb) next
+The program is not being run.
+(gdb) run
+Starting program: /mnt/d/Claude_code/职业规划导师/present/code/c/build/A02
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Breakpoint 1, main () at A02.c:4
+4         printf("%zu\n",sizeof(char));       //1
+(gdb) next
+1
+5         printf("%zu\n",sizeof(short));      //2
+(gdb) next
+2
+6         printf("%zu\n",sizeof(int));        //4
+(gdb) next
+4
+7         printf("%zu\n",sizeof(long long));  //8
+(gdb) next
+8
+8         printf("%zu\n",sizeof(long));       //8
+(gdb) next
+8
+9         printf("%zu\n",sizeof(float));      //4
+(gdb) next
+4
+10        printf("%zu\n",sizeof(double));     //8
+(gdb) next
+8
+11        printf("%zu\n",sizeof(size_t));     //8
+(gdb) next
+8
+12        printf("%zu\n",sizeof(char*));      //8
+(gdb) next
+8
+13        printf("%zu\n",sizeof(int*));       //8
+(gdb) next
+8
+14        printf("%zu\n",sizeof(double*));    //8
+(gdb) next
+8
+15        printf("%zu\n",sizeof(void*));      //8
+(gdb) next
+8
+17        printf("%zu\n", sizeof(int));
+(gdb) next
+4
+18        printf("%ld\n", (long)sizeof(int));
+(gdb) next
+4
+19        printf("%d\n", sizeof(int));
+(gdb) next
+4
+26        printf("%zu\n",sizeof(s));        //12
+(gdb) next
+12
+28        printf("%d\n", (size_t)5000000000);
+(gdb) next
+705032704
+30        return 0;
+(gdb)
+
+3.2这种应付文档的操作就不要给我做啊，而且我只是梳理了/syrk/jurisdiction/list这一个接口的调用线就证明我搞懂了所有链路吗？你不要想着仅仅让我看看代码就能彻底搞懂，最重要的还是能让我独立写出一条完整的链路来才能证明我搞懂了，你现在太轻视java这条线了
+
+不得不说，你布置的任务，里面让我学到的知识密度是真的低，这个礼拜我回顾了一下，学到的东西寥寥无几，一个硬核的东西都没有

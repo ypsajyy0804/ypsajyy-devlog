@@ -1,0 +1,43 @@
+定向学习
+1. 0
+2. top = 3，第三个元素在 data[2]
+3. 最大能到 8，到 8 算满了；
+
+任务一：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业
+规划导师/present/code/ds$ gcc -g -Wall -Wextra -Werror -o ./build/S01 S01.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规
+划导师/present/code/ds$ ./build/S01
+init: is_empty=1
+push 3 -> 1
+push 7 -> 1
+push 11 -> 1
+pop -> 11, is_empty=0
+push 满 -> 0
+pop 空 -> 0
+
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规
+划导师/present/code/ds$ valgrind --leak-check=full ./build/S01
+==1517== Memcheck, a memory error detector
+==1517== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==1517== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==1517== Command: ./build/S01
+==1517==
+init: is_empty=1
+push 3 -> 1
+push 7 -> 1
+push 11 -> 1
+pop -> 11, is_empty=0
+push 满 -> 0
+pop 空 -> 0
+==1517==
+==1517== HEAP SUMMARY:
+==1517==     in use at exit: 0 bytes in 0 blocks
+==1517==   total heap usage: 1 allocs, 1 frees, 1,024 bytes allocated
+==1517==
+==1517== All heap blocks were freed -- no leaks are possible
+==1517==
+==1517== For lists of detected and suppressed errors, rerun with: -s
+==1517== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+解决了不知道 vec_resize 中执行情况的问题，stack_push 利用 0 和 1 来判断代码执行情况

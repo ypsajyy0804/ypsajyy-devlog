@@ -1,0 +1,113 @@
+定向学习：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/c/Users/Xmf$ curl --noproxy '*' http://172.24.48.1:8080/hi
+hello
+把路径改为 hello 再访问 hi：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/c/Users/Xmf$ curl --noproxy '*' http://172.24.48.1:8080/hi
+{"timestamp":"2026-10-26T11:35:24.345+00:00","status":404,"error":"Not Found","path":"/hi"}ypsajyy@LAPTOP-UA13PBC7:/mnt/c/Users/Xmf$
+ypsajyy@LAPTOP-UA13PBC7:/mnt/c/Users/Xmf$ curl --noproxy '*' -v http://172.24.48.1:8080/hi
+*   Trying 172.24.48.1:8080...
+* Connected to 172.24.48.1 (172.24.48.1) port 8080 (#0)
+> GET /hi HTTP/1.1
+> Host: 172.24.48.1:8080
+> User-Agent: curl/7.81.0
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 404
+< Vary: Origin
+< Vary: Access-Control-Request-Method
+< Vary: Access-Control-Request-Headers
+< Content-Type: application/json
+< Transfer-Encoding: chunked
+< Date: Mon, 26 Oct 2026 11:35:46 GMT
+<
+* Connection #0 to host 172.24.48.1 left intact
+{"timestamp":"2026-10-26T11:35:46.196+00:00","status":404,"error":"Not Found","path":"/hi"}
+
+404 状态码可以推理出接口路径（或请求资源）不存在
+未定义路径：
+Whitelabel Error Page
+This application has no explicit mapping for /error, so you are seeing this as a fallback.
+
+Mon Oct 26 09:01:00 CST 2026
+There was an unexpected error (type=Not Found, status=404).
+
+
+任务一：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/c/Users/Xmf$ ip route show
+default via 172.24.48.1 dev eth0 proto kernel
+172.24.48.0/20 dev eth0 proto kernel scope link src 172.24.60.200
+ypsajyy@LAPTOP-UA13PBC7:/mnt/c/Users/Xmf$ curl -v --noproxy '*' -X POST "http://172.24.48.1:8080/book?title=CProgramming&author=me"
+*   Trying 172.24.48.1:8080...
+* Connected to 172.24.48.1 (172.24.48.1) port 8080 (#0)
+> POST /book?title=CProgramming&author=me HTTP/1.1
+> Host: 172.24.48.1:8080
+> User-Agent: curl/7.81.0
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200
+< Content-Type: text/plain;charset=UTF-8
+< Content-Length: 2
+< Date: Mon, 26 Oct 2026 11:02:26 GMT
+<
+1
+* Connection #0 to host 172.24.48.1 left intact
+ypsajyy@LAPTOP-UA13PBC7:/mnt/c/Users/Xmf$ curl -v --noproxy '*' http://172.24.48.1:8080/book
+*   Trying 172.24.48.1:8080...
+* Connected to 172.24.48.1 (172.24.48.1) port 8080 (#0)
+> GET /book HTTP/1.1
+> Host: 172.24.48.1:8080
+> User-Agent: curl/7.81.0
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200
+< Content-Type: application/json
+< Transfer-Encoding: chunked
+< Date: Mon, 26 Oct 2026 11:04:21 GMT
+<
+* Connection #0 to host 172.24.48.1 left intact
+[{"id":1,"title":"CProgramming","author":"me"}]ypsajyy@LAPTOP-UA13PBC7:/mnt/c/Users/Xmf$ curl -v --noproxy '*' http://172.24.48.1:8080/book/1
+*   Trying 172.24.48.1:8080...
+* Connected to 172.24.48.1 (172.24.48.1) port 8080 (#0)
+> GET /book/1 HTTP/1.1
+> Host: 172.24.48.1:8080
+> User-Agent: curl/7.81.0
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200
+< Content-Type: application/json
+< Transfer-Encoding: chunked
+< Date: Mon, 26 Oct 2026 11:04:39 GMT
+<
+* Connection #0 to host 172.24.48.1 left intact
+ypsajyy@LAPTOP-UA13PBC7:/mnt/c/Users/Xmf$ curl -v --noproxy '*' -X DELETE http://172.24.48.1:8080/book/1
+*   Trying 172.24.48.1:8080...
+* Connected to 172.24.48.1 (172.24.48.1) port 8080 (#0)
+> DELETE /book/1 HTTP/1.1
+> Host: 172.24.48.1:8080
+> User-Agent: curl/7.81.0
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200
+< Content-Type: application/json
+< Transfer-Encoding: chunked
+< Date: Mon, 26 Oct 2026 11:05:18 GMT
+<
+* Connection #0 to host 172.24.48.1 left intact
+true
+
+第二条的接口返回的是一个 List 对象，Java 中它是一个容器/列表，Jackson 看到这是一个集合，就会使用方括号 [] 来表示这是一个数组；
+第三条返回的是一个 Books 实体对象， Java 中它是一个单个对象，Jackson 看到这是一个对象，会把它的属性（id、title、author）转换成键值对，用大括号包裹；
+
+任务2：
+1.我用 curl 工具向监听 8080 端口的服务发送 http 请求，最早接到请求的其实是 Tomcat 服务器，再由 Springboot MVC 根据 URL 和 HTTP 方法匹配 Controller（代码中的 selectId），对应业务代码查找书籍并返回 Book 对象，最后由 Spring MVC 中的消息转换机制（Jackson）序列化为 JSON 返回；
+
+2.根据传入请求里的 url 路径（/book/{id}）知道需要调 selectId() 这个方法
+你可能会说，明明 deleteBooks() 方法的 Mapping 路径也是（/book/{id}），为什么没用这个方法？
+curl 在不用 -X 指定请求方式时，默认是 GET 请求，对应  selectId()  这个方法的注解 GETMapping("/book/{id}")
+
+3.Java 中它是一个单个对象，Jackson 看到这是一个对象，会把它的属性（id、title、author）转换成键值对，用大括号包裹；

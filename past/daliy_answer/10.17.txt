@@ -1,0 +1,126 @@
+curl --noproxy '*' -v http://localhost:8000/（wsl配置过代理，用noproxy绕过）
+> 开头：GET / HTTP/1.1      //请求头
+< 开头：HTTP/1.0 200 OK   //响应头
+200指服务器处理成功
+
+ curl --noproxy '*' -v http://localhost:8000/nothing-here
+> 开头：GET /nothing-here HTTP/1.1
+< 开头：HTTP/1.0 404 File not found
+404指服务器不存在对应的资源
+
+A04我在15号上午就已经补过过了
+
+任务二
+你问的问题也太笼统的，好歹说清楚具体的是哪个项目的链路啊？你不讲明白我怎么知道具体精确到什么类、文件、组件？
+我就以syrk项目的一次访问为例，前后端开启，前端端口80，后端端口48080：
+浏览器地址栏输入地址：http://localhost/manage/jurisdiction
+							|
+							|
+							|
+		浏览器向前端发送请求并拿到前端的html等数据
+							|
+							|
+							|
+前端代码向后端接口请求数据，这里以“D:\workspaces\syrk\jwpt-syrk-mini\jwpt-module-syrk-jurisdiction\src\main\java\cn\ykyr\jwpt\module\syrk\jurisdiction\controller\admin\JurisdictionController.java”接口为例，
+							|
+							|
+							|
+前端请求了“http://127.0.0.1:48080/admin-api/syrk/jurisdiction/list”，接待员JurisdictionController.java给予响应，它会去调用server层（D:\workspaces\syrk\jwpt-syrk-mini\jwpt-module-syrk-jurisdiction\src\main\java\cn\ykyr\jwpt\module\syrk\jurisdiction\service\JurisdictionService.java）的getJurisdictionList，server层的实现类（JurisdictionServiceImpl.java）又会去调用dal实体层查询具体数据
+							|
+							|
+							|
+拿到/syrk/jurisdiction/list的数据后返回给前端，最终显示在浏览器的页面上
+
+这是我在浏览器控制台上手动敲开后端大门的测试（JavaScript我不会，让AI 生成的）：
+fetch('http://127.0.0.1:48080/admin-api/syrk/jurisdiction/list', {
+    method: 'GET',
+    headers: {
+        'Authorization': 'Bearer test1'
+    }
+}).then(res => res.json()).then(data => console.log(data));
+
+以及在wsl命令行上手动拿前端html和后端数据：
+curl --noproxy '*' -v http://172.24.48.1:80/
+curl --noproxy '*' -v -H "Authorization: Bearer test1" -H "tenant-id: 1" http://172.24.48.1:48080/admin-api/syrk/jurisdiction/list
+宿主机ip查询：ip route show | grep default | awk '{print $3}'
+
+先在看到第三问“•  参照任务上面那个 200 / 404 的请求：换成你的项目，这个请求会在哪一层被谁接住？”才知道你上面要我分析用python开的http服务器“cd /tmp && python3 -m http.server 8000 &
+curl -v http://localhost:8000/
+curl -v http://localhost:8000/nothing-here
+”的链路，可是我对python开的http服务器完全不了解，也看不到它的内部，具体的类、文件、组件都是黑盒，你让我怎么画链路图？这题目不是sb吗？反正我自己syrkk项目的一个链路画在上面了
+
+任务三
+服了，你的题目能不能标准点具体点？也不说清楚是单项链表还是双向链表
+
+我写的B02.c是一个单向列表
+图我就不画在纸上了，懒得拍照，在这里简单画一个给你：
+p1-->p2-->p2-->NULL
+同时：
+p1<--p2<--p3-->NULL
+
+也可以这样画：
+100-->200-->300-->NULL
+同时：
+p100-200<--300-->NULL
+
+如何使用gbd对答案：
+(gdb) break main
+Note: breakpoints 2 and 3 also set at pc 0x555555555195.
+Breakpoint 4 at 0x555555555195: file B02.c, line 11.
+(gdb) run
+Starting program: /mnt/d/Claude_code/职业规划导师/present/code/c/build/B02
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Breakpoint 2, main () at B02.c:11
+11        Node* p1 = malloc(sizeof(Node));
+(gdb) next
+12        Node* p2 = malloc(sizeof(Node));
+(gdb) p p1
+$14 = (Node *) 0x5555555592a0
+(gdb) next
+13        Node* p3 = malloc(sizeof(Node));
+(gdb) p p2
+$15 = (Node *) 0x5555555592c0
+(gdb) next
+15        if(p1 == NULL || p2 == NULL || p3 == NULL)
+(gdb) p p3
+$16 = (Node *) 0x5555555592e0
+(gdb) next
+18        p1->data =100;  //等价于（*p1）.data = 100;
+(gdb) next
+19        p2->data = 200;
+(gdb) next
+20        p3->data = 300;
+(gdb) next
+22        p1->next = p2;
+(gdb) p *p1
+$17 = {data = 100, next = 0x0, prev = 0x0}
+(gdb) p *p2
+$18 = {data = 200, next = 0x0, prev = 0x0}
+(gdb) p *p3
+$19 = {data = 300, next = 0x0, prev = 0x0}
+(gdb) next
+23        p2->next = p3;
+(gdb) p *p1
+$20 = {data = 100, next = 0x5555555592c0, prev = 0x0}
+(gdb) next
+24        p3->next = NULL;
+(gdb) next
+26        p2->prev = p1;
+(gdb) p *p2
+$21 = {data = 200, next = 0x5555555592e0, prev = 0x0}
+(gdb) next
+27        p3->prev = p2;
+(gdb) p *p2
+$22 = {data = 200, next = 0x5555555592e0, prev = 0x5555555592a0}
+(gdb) next
+29        printf("%d\n", p1->data);
+(gdb) p p1->next
+$23 = (struct Node *) 0x5555555592c0
+(gdb) p *(p1->next)
+$24 = {data = 200, next = 0x5555555592e0, prev = 0x5555555592a0}
+(gdb) p p3->prev
+$25 = (struct Node *) 0x5555555592c0
+(gdb) p *(p3->prev)
+$26 = {data = 200, next = 0x5555555592e0, prev = 0x5555555592a0}

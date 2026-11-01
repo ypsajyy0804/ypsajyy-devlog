@@ -1,0 +1,74 @@
+       1 User commands (Programs)
+              Commands that can be executed by the user from within a shell.
+
+       2 System calls
+              Functions which wrap operations performed by the kernel.
+
+       3 Library calls
+              All  library functions excluding the system call wrappers (Most of the
+              libc functions).
+
+       4 Special files (devices)
+              Files found in /dev which allow to access to devices through the  ker‐
+              nel.
+
+       5 File formats and configuration files
+              Describes various human-readable file formats and configuration files.
+
+       6 Games
+              Games and funny little programs available on the system.
+
+       7 Overview, conventions, and miscellaneous
+              Overviews  or  descriptions  of various topics, conventions and proto‐
+              cols, character set standards, the  standard  filesystem  layout,  and
+              miscellaneous other things.
+
+       8 System management commands
+              Commands like mount(8), many of which only root can execute.
+
+9：没有显示给我，只打印了上面的 8 个
+
+分区 					例子
+  1		用户命令			man 1 ls
+  2		系统调用			man 2 open
+  3		库函数			man 3 printf
+  4		特殊文件（设备）   man 4 null
+  5		文件格式/配置文件	man 5 passwd
+  6		游戏				man 6
+  7		概述/约定/杂项	man 7 man-pages
+  8		系统管理命令		man 8 mount
+  9		Linux 内核例程	
+
+任务一
+显示：
+i：插入模式 -- INSERT --
+Esc：退出，"vimtest.txt" 3L, 37B
+man 2 open
+ERRORS
+ENOENT O_CREAT is not set and the named file does not exist.
+
+ENOENT A directory component in pathname does not exist or is a dangling sym‐
+              bolic link.
+
+ENOENT pathname refers to a  nonexistent  directory,  O_TMPFILE  and  one  of
+              O_WRONLY  or  O_RDWR  were specified in flags, but this kernel version
+              does not provide the O_TMPFILE functionality.
+
+man 3 printf
+RETURN VALUE
+       Upon successful return, these functions return the number of characters printed (excluding the null byte used to end output to strings).
+
+       The functions snprintf() and vsnprintf() do not write more than size bytes (including the terminating null byte ('\0')).  If the output was trun‐
+       cated due to this limit, then the return value is the number of characters (excluding the terminating null byte) which would have been written to
+       the  final string if enough space had been available.  Thus, a return value of size or more means that the output was truncated.  (See also below
+       under NOTES.)
+printf 成功时返回打印的字节个数：
+int n = printf("hello" );
+printf(n);		//n = 5
+
+int n = printf("你好");
+printf(n); 	//n = 6
+
+man printf：查找 printf 的手册，不限制分区
+man 3 printf ：明确查找第三分区的手册
+两者不是同一个东西
