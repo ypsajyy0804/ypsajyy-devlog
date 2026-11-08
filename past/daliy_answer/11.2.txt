@@ -1,0 +1,95 @@
+FILE *fopen(const char *filename, const char *mode);
+
+filename	文件路径或文件名
+mode	打开模式：
+	r：read，读取。
+	w：write，写入（会清空原文件）。
+	a：append，追加。
+
+返回值：
+- 成功：返回一个 FILE *。
+- 失败：返回 NULL。
+
+
+char *fgets(char *str, int n, FILE *stream);
+
+str	用来存放读取内容的字符数组
+n	最多读取多少个字符（包含结尾的 \0）
+stream	从哪个文件流读取，也就是 FILE *
+只从从文件中读取一行，如果在读取上限以内遇到了换行符，fgets 会把换行符也读进来，读到换行符后就停止，不会继续读取下一行。
+
+返回值：
+读取成功：返回 str，也就是你传进去的字符数组地址。
+读取失败或已经到达文件末尾且没有读到字符：返回 NULL。
+
+
+定向学习：
+1. 8个，'\0'
+2. NULL，会发生未定义错误
+3. 读取失败或已经到达文件末尾且没有读到字符时
+
+注：以后尽量不要让我直接用 man 命令去查官方手册，我的英文很烂，几乎看不懂
+
+任务一：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/ds$ gcc -g -Wall -Wextra -Werror -o ./build/S03 S03.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/ds$ ./build/S03
+() -> 1
+([{}]) -> 1
+(] -> 0
+(() -> 0
+)( -> 0
+a(b)c[d] -> 1
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/ds$ valgrind --leak-check=full ./build/S03
+==7498== Memcheck, a memory error detector
+==7498== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==7498== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==7498== Command: ./build/S03
+==7498==
+() -> 1
+([{}]) -> 1
+(] -> 0
+(() -> 0
+)( -> 0
+a(b)c[d] -> 1
+==7498==
+==7498== HEAP SUMMARY:
+==7498==     in use at exit: 0 bytes in 0 blocks
+==7498==   total heap usage: 1 allocs, 1 frees, 1,024 bytes allocated
+==7498==
+==7498== All heap blocks were freed -- no leaks are possible
+==7498==
+==7498== For lists of detected and suppressed errors, rerun with: -s
+==7498== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+")(" 触发了“读到的是右括号，此时栈是空的	立即返回 `0`”
+"(()" 触发了“扫到字符串结尾 '\0' 之后栈不空（还剩没配对的左括号）”
+
+
+任务二：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ gcc -g -Wall -Wextra -Werror -o ./build/F01 F01.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ ./build/F01
+lines = 4
+longest = 11
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ valgrind --leak-check=full ./build/F01
+==22501== Memcheck, a memory error detector
+==22501== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==22501== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==22501== Command: ./build/F01
+==22501==
+lines = 4
+longest = 11
+==22501==
+==22501== HEAP SUMMARY:
+==22501==     in use at exit: 0 bytes in 0 blocks
+==22501==   total heap usage: 3 allocs, 3 frees, 5,592 bytes allocated
+==22501==
+==22501== All heap blocks were freed -- no leaks are possible
+==22501==
+==22501== For lists of detected and suppressed errors, rerun with: -s
+==22501== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+修改 data.txt 为 data.txt.bak：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/职业规划导师/present/code/c$ ./build/F01
+打开文件失败
+
+通过检查每次读取到的某行（存储在 buf 中）结尾处是否存在 '\n' 这个字符，存在则使长度减一，不存在则是原长度（比如文件最后一行）的方式来去除；

@@ -1,0 +1,127 @@
+static 全局变量  →  “只给这个 .c 文件用”
+static 局部变量  →  “函数结束了，变量还留着”
+extern                →  “东西在别的地方，我这里只声明一下”
+
+定向学习：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim sa.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim sb.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror -o build/st sa.c sb.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/st
+counter = 3
+from main: 3
+
+修改 sa.c 第三行，增加前缀 static：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim sa.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror -o build/st sa.c sb.c
+/usr/bin/ld: /tmp/ccB0Js7P.o: warning: relocation against `counter' in read-only section `.text'
+/usr/bin/ld: /tmp/ccB0Js7P.o: in function `main':
+sb.c:(.text+0x1e): undefined reference to `counter'
+/usr/bin/ld: warning: creating DT_TEXTREL in a PIE
+collect2: error: ld returned 1 exit status
+
+修好 sa.c，改  sb.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim sb.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim sa.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror -o build/st sa.c sb.c
+/usr/bin/ld: /tmp/ccogV64l.o:(.bss+0x0): multiple definition of `counter'; /tmp/cccyuMI2.o:(.bss+0x0): first defined here
+collect2: error: ld returned 1 exit status
+重复定义
+
+1.根据这一条：“/usr/bin/ld: /tmp/ccB0Js7P.o: in function `main':sb.c:(.text+0x1e): undefined reference to `counter'”
+可以看出报错出在链接阶段
+2.C 语言就是这么定义的，说为什么就去问作者，不要问这种没有意义的问题；差在一个 extern，表示“东西在别的地方定义过，我这里只声明一下”；
+3.ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -c sa.c -o sa.o
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ nm sa.o | grep -E 'bump|counter'
+0000000000000000 t bump
+0000000000000000 B counter
+bump 是小写，counter 是大写；sa.c 内定义 bump 时增加了前缀 static，定义 counter 时没有，在全局变量前放 static，作用就是只在本文件内可见，别的 .o 看不见，这刚好对应 bump 这行出现的是小写的 t；而 counter 没有，所以别的 .o 能看见。
+
+任务1：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/stat$ mkdir -p build
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/stat$ ls -l
+total 0
+drwxrwxrwx 1 ypsajyy ypsajyy 4096 Nov  8 11:21 build
+-rwxrwxrwx 1 ypsajyy ypsajyy  225 Nov  8 11:20 counter.c
+-rwxrwxrwx 1 ypsajyy ypsajyy   93 Nov  8 11:04 counter.h
+-rwxrwxrwx 1 ypsajyy ypsajyy  391 Nov  8 11:07 main.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/stat$ gcc -Wall -Wextra -Werror -o build/counter main.c counter.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/stat$ ./build/counter
+inc1 = 1
+inc2 = 2
+inc3 = 3
+get = 3
+cap = 1000
+
+故意实验：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/stat$ vim main.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/stat$ gcc -Wall -Wextra -Werror -o build/counter main.c counter.c
+/usr/bin/ld: /tmp/ccleuEO8.o: warning: relocation against `count' in read-only section `.text'
+/usr/bin/ld: /tmp/ccleuEO8.o: in function `main':
+main.c:(.text+0xe): undefined reference to `count'  //显示未定义 count
+/usr/bin/ld: warning: creating DT_TEXTREL in a PIE
+collect2: error: ld returned 1 exit status
+
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/stat$ valgrind --leak-check=full ./build/counter
+==340== Memcheck, a memory error detector
+==340== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==340== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==340== Command: ./build/counter
+==340==
+inc1 = 1
+inc2 = 2
+inc3 = 3
+get = 3
+cap = 1000
+==340==
+==340== HEAP SUMMARY:
+==340==     in use at exit: 0 bytes in 0 blocks
+==340==   total heap usage: 1 allocs, 1 frees, 1,024 bytes allocated
+==340==
+==340== All heap blocks were freed -- no leaks are possible
+==340==
+==340== For lists of detected and suppressed errors, rerun with: -s
+==340== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+1.先区分两个阶段在做什么，编译阶段检测语法问题，链接阶段才是拼接各个文件的内容；编译没有发现问题，而链接时，因为 counter.c 内定义 count 是用了 static，即使 main.c 里声明 extern int count 也使用不了 count，因此报错；
+2.ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/stat$ gcc -Wall -Wextra -Werror -c counter.c -o counter
+.o
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/stat$ nm counter.o
+0000000000000000 t clamp
+0000000000000000 b count
+0000000000000041 T counter_get
+0000000000000020 T counter_inc
+那两行是小写的，差在定义时有 static 修饰， 只在本文件内可见，而 counter_inc 定义时未使用 static，所以全局可见；
+
+
+任务二：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim static_local.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror -o build/sl static_local.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/sl
+id1 = 1
+id2 = 2
+id3 = 3
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ grep -nE '^[a-z].*[a-z_]+ *=' static_local.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$  valgrind --leak-check=full ./build/sl
+==366== Memcheck, a memory error detector
+==366== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==366== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==366== Command: ./build/sl
+==366==
+id1 = 1
+id2 = 2
+id3 = 3
+==366==
+==366== HEAP SUMMARY:
+==366==     in use at exit: 0 bytes in 0 blocks
+==366==   total heap usage: 1 allocs, 1 frees, 1,024 bytes allocated
+==366==
+==366== All heap blocks were freed -- no leaks are possible
+==366==
+==366== For lists of detected and suppressed errors, rerun with: -s
+==366== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$
+
+这一题关于“peek_id 里怎么拿到 next_id 里那个 static 变量，返回当前值，又不许递增，计数器变量必须定义在 `next_id` 函数体内部，用 static 定义”这些要求，我认为是无解的；
+
+1.问题不成立，第四行无法实现；前三行变为：1,1,1；
+2.落在数据区/Data/BSS，应为栈内存储的是普通的局部变量，调用完相应函数后生命周期就会结束，而 static 修饰的变量是静态变量，调用完函数后依旧存在，生命周期还没结束；

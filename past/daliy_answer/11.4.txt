@@ -1,0 +1,155 @@
+一个 C 程序从代码到可执行文件经历的 4 个阶段：
+[源文件 .c] 
+    ↓ 1. 预处理 (Preprocessing) -> 展开宏、头文件 #include
+[中间文件] 
+    ↓ 2. 编译 (Compilation)     -> 检查语法、生成汇编代码 (警告在这里产生)
+[汇编文件 .s] 
+    ↓ 3. 汇编 (Assembly)        -> 转成机器码的二进制目标文件 (.o)
+[目标文件 .o] 
+    ↓ 4. Linking (链接)         -> 把多个 .o 和库函数拼起来 (报错在这里产生)
+[可执行文件]
+
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror -o ./build/nolink nolink.c
+/usr/bin/ld: /tmp/cc7rkGfS.o: in function `main':
+nolink.c:(.text+0x13): undefined reference to `add'
+collect2: error: ld returned 1 exit status
+第一次报错里有 error 这个词，报错出现在链接阶段；
+
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -o ./build/nolink nolink.c
+nolink.c: In function ‘main’:
+nolink.c:6:20: warning: implicit declaration of function ‘add’ [-Wimplicit-function-declaration]
+    6 |     printf("%d\n", add(1, 2));
+      |                    ^~~
+/usr/bin/ld: /tmp/ccCtiiXo.o: in function `main':
+nolink.c:(.text+0x18): undefined reference to `add'
+collect2: error: ld returned 1 exit status
+
+nolink.c:6:20: warning: implicit declaration of function ‘add’：编译器在抱怨
+/usr/bin/ld: /tmp/cc7rkGfS.o: in function `main'：工具路径 /usr/bin/ld，这里的 ld 就是 Linux 系统标准的链接器（Linker）名字。；中间文件 /tmp/ccCtiiXo.o，链接器操作的不再是源文件 .c，而是编译器刚才生成的目标文件 .o链接器在抱怨
+
+任务一：
+开始之前我需要补充一点：
+vec.h 中，声明函数时后面括号里的形参使用了 “size_of”类型，头文件必须引入“#include <stddef.h>”,否则会报错
+
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror -c vec.c -o build/vec.o
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror -c main.c -o build/main.o
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror build/vec.o build/main.o -o build/vec
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$
+
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/vec > after.txt
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ diff before.txt after.txt
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$
+
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ valgrind --leak-check=full ./build/vec
+==275== Memcheck, a memory error detector
+==275== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==275== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==275== Command: ./build/vec
+==275==
+初始数组：
+1
+2
+3
+4
+插入 9 :
+1
+2
+9
+3
+4
+删除一个元素：
+2
+9
+3
+4
+capacity = 100, size = 0
+==275==
+==275== HEAP SUMMARY:
+==275==     in use at exit: 0 bytes in 0 blocks
+==275==   total heap usage: 3 allocs, 3 frees, 1,444 bytes allocated
+==275==
+==275== All heap blocks were freed -- no leaks are possible
+==275==
+==275== For lists of detected and suppressed errors, rerun with: -s
+==275== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ls -lh
+total 44K
+-rwxrwxrwx 1 ypsajyy ypsajyy  133 Oct 14 08:21 A01.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  820 Oct 15 11:25 A02.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  156 Oct 14 12:03 A03.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  713 Oct 15 12:13 A04.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  264 Oct 15 11:19 B01.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  823 Oct 18 11:48 B05.c
+-rwxrwxrwx 1 ypsajyy ypsajyy 1.9K Oct 18 12:06 B06.c
+-rwxrwxrwx 1 ypsajyy ypsajyy 1.2K Oct 31 17:27 C01.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  467 Nov  2 23:38 F01.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  206 Oct 21 18:00 P03.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  136 Oct 21 18:27 P04a.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  202 Oct 21 18:27 P04b.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  330 Oct 21 19:50 P05.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  503 Oct 29 16:15 P06.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  769 Nov  1 17:24 S02.c
+-rwxrwxrwx 1 ypsajyy ypsajyy 1.3K Oct 25 17:26 V03.c
+-rwxrwxrwx 1 ypsajyy ypsajyy 1.8K Oct 24 16:54 V04.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  100 Nov  5 09:07 after.txt
+-rwxrwxrwx 1 ypsajyy ypsajyy  161 Oct 21 16:40 asan_demo.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  100 Nov  4 21:43 before.txt
+drwxrwxrwx 1 ypsajyy ypsajyy 4.0K Nov  5 09:03 build
+-rwxrwxrwx 1 ypsajyy ypsajyy 1.7K Oct 26 00:09 checkpoint_W4.c
+-rwxrwxrwx 1 ypsajyy ypsajyy   30 Nov  2 23:30 data.txt
+-rwxrwxrwx 1 ypsajyy ypsajyy  710 Oct 29 15:30 err.txt
+-rwxrwxrwx 1 ypsajyy ypsajyy  752 Nov  4 23:05 main.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  111 Nov  4 20:54 nolink.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  207 Oct 17 16:34 struct_learning.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  148 Nov  1 15:57 temp.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  300 Oct 27 08:08 tmp_types.c
+-rwxrwxrwx 1 ypsajyy ypsajyy 2.3K Nov  5 00:01 vec.c
+-rwxrwxrwx 1 ypsajyy ypsajyy  359 Nov  5 00:06 vec.h
+-rwxrwxrwx 1 ypsajyy ypsajyy 3.1K Oct 25 20:42 vector.c
+
+有。预处理后，`vec.c` 和 `main.c` 各自都会得到一份 `Vec` 结构体定义。
+但它只是类型定义，不是一个全局变量或函数实体，不会产生需要链接的符号。
+所以：
+- `vec.o`：有一份 `Vec` 类型定义
+- `main.o`：也有一份 `Vec` 类型定义
+- 链接时：不会因为这个打架，因为类型定义本身不参与链接。
+
+"..." 会优先在当前源文件所在目录查找；`<...>` 主要在系统/指定的头文件目录中查找。因此项目自己的头文件通常用双引号，系统/标准库头文件通常用尖括号，两者差在搜索头文件的路径不同
+
+
+任务二：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ make clean
+rm -f build/vec.o build/main.o build/vec
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ make
+gcc -Wall -Wextra -Werror -c vec.c -o build/vec.o
+gcc -Wall -Wextra -Werror -c main.c -o build/main.o
+gcc -Wall -Wextra -Werror build/vec.o build/main.o -o build/vec
+
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ touch main.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ make
+gcc -Wall -Wextra -Werror -c main.c -o build/main.o
+gcc -Wall -Wextra -Werror build/vec.o build/main.o -o build/vec
+带 c 的那条命令只出现一次
+
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ touch vec.h
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ make
+gcc -Wall -Wextra -Werror -c vec.c -o build/vec.o
+gcc -Wall -Wextra -Werror -c main.c -o build/main.o
+gcc -Wall -Wextra -Werror build/vec.o build/main.o -o build/vec
+这次出现两次，比上面多一条：
+gcc -Wall -Wextra -Werror -c vec.c -o build/vec.o
+
+
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ diff <(./build/vec) after.txt
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$
+
+
+1.告诉 make：生成 .o 文件时，不仅依赖对应的 .c 文件，还依赖 vec.h。如果 vec.h 发生变化，对应的 .o 也要重新编译。
+如果从那一行删除 vec.h，make 识别 vec.c、main.c 均没有更新（此时 vec.h 不是依赖），会报：make: 'build/vec' is up to date.
+2.告诉 Make，clean 永远不是一个需要检查时间戳的文件目标，每次执行 make clean，都直接执行它下面的命令。不写的话，如果同目录下存在一个叫 clean 的文件，make clean 命令不会执行 rm -f build/vec.o build/main.o build/vec 删除两个 .o 文件和 vec（make 会把目标名当作文件名来处理，而 clean 这条规则没有依赖，所以只要目录里存在一个名为 clean 的文件，这个目标就永远会被判定为“已是最新”，故不执行 rm 命令）；如果同目录下不存在一个叫 clean 的文件，即使注释了“.PHONY: clean”，make clean 依旧会执行 rm 删除指令
+
+目前我对 Makefile 有了一个基本的概念：
+Make 不负责“无脑执行 gcc”，而是负责判断：哪些东西已经过时了，哪些东西需要重新生成；而判断依据，核心就是：依赖关系 + 文件修改时间。
+Makefile 文件基本结构：目标 (Target): 依赖 (Prerequisites)
+<Tab> 命令 (Command)
