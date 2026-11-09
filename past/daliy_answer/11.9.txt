@@ -1,0 +1,36 @@
+定向学习：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim pad.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -o build/pad pad.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/pad
+A=12 B=8 C=8 D=24 E=12
+1.差了 4 个字节；
+2.是 24，char c 大小为 1，后面是大小为 8 的 long l，由于对齐机制，从第 9 个位置开始放 l，大小变为16，接着放大小为 1 的 char d，再由对齐机制，最终大小为 16 + 8 = 24；
+3.大小一样；说明了在对齐机制下，中间扩展出来的空间可以是空的，不存储数据；
+
+任务一：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim layout.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror -o build/layout layout.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/layout
+sizeof = 32
+name = 0
+age = 12
+salary = 16
+grade = 24
+
+1.0~11:name
+12~15:age
+16~23:salary
+24:grade
+24~31:空字节
+所以多出来的字节只在这一段（而不是两处）：24 ~ 31
+2.age 在前面，从偏移 12 开始占了 4 字节，所以 salary 偏移是 16；
+
+任务二：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim pack.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror -o build/pack pack.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/pack
+before = 24
+after = 16
+
+1.0:a，1:d，4~7:c，8~15:b
+2.c 的偏移是 16，因为 padding：a 偏移 0，b 偏移 8，c 偏移就是 16；
