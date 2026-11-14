@@ -1,0 +1,51 @@
+定向学习：
+define 宏定义只有替换，没有理解
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim macro_op.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -o build/macro_op macro_op.c && ./build/macro_op
+5
+2
+100
+
+1.SQR(1 + 2) = 1 + 2 * 1 + 2 = 5
+2.内层确保 a、b 两个元素先计算（如果是表达式）的优先级；外层保障“ ? : ”三元表达式的计算；
+如果去除内层，MAX(a+1, b) = (a + 1 > b ? a + 1 : b)；这个具体例子不会出错，原因是 ‘+’优先级更高，可以正常先计算 (a + 1) 后进行三元表达式的计算；
+3.展开：100 / 2 * 2 = 100，到第一个 2 为止而不是整个 (2 * 2)
+
+任务一：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim log_macro.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror -DDEBUG -o build/log_dbg log_macro.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror          -o build/log_rel log_macro.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/log_dbg
+[log_macro.c:7] start
+[log_macro.c:8] big
+[log_macro.c:9] done
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/log_rel
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$./build/log_rel | wc -c
+0
+
+1.-DDEBUG 是在编译时定义 DEBUG 宏，等价于预处理阶段的 #define DEBUG 1；区别是前者通过编译命令定义，后者写在源代码中
+2.利用：gcc -DDEBUG -E log_macro.c 查看预处理后的结果（你说的关掉 DEBUG 不清晰，如果是直接 gcc -E log_macro.c，预处理时会直接删除那几处 LOG()；要彻底不用 DEBUG 需要删除“ifdef DEBUG”“endif”等代码）
+展开成：printf("[%s:%d] %s\n", "log_macro.c", 7, "start");;
+
+任务二：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim check.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror -o build/check check.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/check
+ok
+after first
+FAIL at 15
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ echo $?
+1
+
+1.在预处理阶段，能，我利用“gcc -E check.c”可以查看到：
+do{ if(1 + 1 == 2) printf("ok\n"); else { printf("FAIL at %d\n", 13); return 1; } }while(0);
+do{ if(2 > 3) printf("ok\n"); else { printf("FAIL at %d\n", 15); return 1; } }while(0);
+这两行中 __LINE__ 被替换成数字；
+2.不会有问题，因为我在外面包了 do { ... } while(0) 后，它在语法上变成了一个完整的块，无论怎么在 if-else 里嵌套，都不会破坏外层的 else 匹配，修改代码，注释原来的 CHECK(1 + 1 == 2)，新增if (1) CHECK(1 + 1 == 2); else printf("else\n"); 编译运行：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim check.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror -o build/check check.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/check
+ok
+after first
+FAIL at 16
+没有问题；

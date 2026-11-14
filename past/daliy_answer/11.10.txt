@@ -1,0 +1,52 @@
+定向学习：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim bits_op.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -o build/bits_op bits_op.c && ./build/bits_op
+1 7 6
+-6 -4
+2147483648
+
+1.~5 打出 -6，不是 42 亿多，是因为 ~ 没有放过符号位，而是把整数的每一位都取反，最高位也被取反了。最高位为 1 表示这是负数，按补码解释就是 -6
+2.-8 = 11111111 11111111 11111111 11111000，补零：
+01111111 11111111 11111111 11111100
+换成十进制是：2147483644
+GCC 对负数执行 >> 时，使用的是算术右移而不是逻辑右移：左边补 1
+3.1 << 31，1 的 32 位二进制：
+00000000 00000000 00000000 00000001，
+左移 31 位：
+10000000 00000000 00000000 00000000：最高位为 1，其余 31 位全为 0 的二进制串，定义上直接代表最小值 -2147483648
+u 的作用就是让 1 变成 unsigned int，32 位 int 的范围通常是：-2147483648 ~ 2147483647，unsigned int 的范围通常是：0 ~ 4294967295，使 10000000 00000000 00000000 00000000 合法表示为 2147483648；
+
+任务一：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim bits.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror -o build/bits bits.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/bits
+00000000000000000000000000000101
+00000000000000000000000000000110
+00000000000000000000000000000111
+11111111111111111111111111111010
+10000000000000000000000000000000
+
+1.我的循环跑了 32 次，第 i 次循环打印的是 v 的 33-i 位；
+2.如果把参数改为 int，将会打印：11111111111111111111111111111111，涉及到 -1 的二进制补码表示：
+1 的二进制数 00000000000000000000000000000001，取反再加 1，就是 11111111111111111111111111111111；
+
+任务二：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror -o build/flags flags.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/flags
+f = 129
+bit0 = 1
+bit3 = 0
+count = 2
+
+1.
+第一次：00000001十进制：1，十六进制：1
+第二次：00001001十进制：9，十六进制：9
+第三次：10001001十进制：137，十六进制：89
+第四次：越界，f 依旧是10001001十进制：137，十六进制：89
+第五次：10000001十进制：129，十六进制：81
+2.通过固定循环 8 次，遇到 1 就累计一次加法；
+可以通过x &= x - 1：消灭最低位的 1 的方法让它只跑「1 的个数」那么多次：
+while(flags != 0){	
+	flags &= flags - 1;
+	count++;
+}
