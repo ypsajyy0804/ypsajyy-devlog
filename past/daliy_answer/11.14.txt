@@ -1,0 +1,75 @@
+fopen() 参数：
+binary——以二进制写入方式打开文件
+
+用于将格式化的数据写入到指定的流（Stream）中
+int fprintf(FILE *stream, const char *format, ...);
+stream：指向 FILE 对象的指针
+format：格式化字符串，用法与 printf() 完全相同
+
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim bin_io.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ xxd num.bin
+00000000: 0100 0000 0200 0000 0300 0000            ............
+
+1.以“元素”为单位，返回值是 12，写入 12 个元素；
+2.01 00 00 00  02 00 00 00  03 00 00 00
+1：0~3
+2：4~7
+3：8~12
+第一个字节就是 01，我的 x64 架构 CPU 采用的是小端字节序——即低位字节存放在低地址，高位字节存放在高地址；
+3.知道，会打印：
+1
+4
+
+任务一：
+这一个任务由于你没有进一步明确题意，导致我一开始采用 fgets + sscanf + strstr + fseek 是“文本文件原地修改”的思路，把结构体的数据转换成文字写入文件，这是第一种实现方法：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror -o build/recdb2 recdb2.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/recdb2 rec2.txt write
+wrote 3 records,82 bytes
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/recdb2 rec2.txt show
+id=1 name=alice score=90.50
+id=2 name=bob score=85.00
+id=3 name=carol score=77.25
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/recdb2 rec2.txt patch 2 99.00
+patched id=2
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/recdb2 rec2.txt show
+id=1 name=alice score=90.50
+id=2 name=bob score=99.00
+id=3 name=carol score=77.25
+
+第二种实现方法：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim recdb.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror -o build/recdb recdb.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ rm rec.bin
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/recdb rec.bin write
+wrote 3 records, 96 bytes
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/recdb rec.bin show
+id=1 name=alice score=90.50
+id=2 name=bob score=85.00
+id=3 name=carol score=77.25
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/recdb rec.bin patch 2 99.00
+patched id=2
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/recdb rec.bin show
+id=1 name=alice score=90.50
+id=2 name=bob score=99.00
+id=3 name=carol score=77.25
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/recdb rec.bin write
+exists, skip
+
+1.
+0~3：id
+4~19：name
+20~23：空的
+24~31：score
+2.通过 index * sizeof(struct Rec) 来计算某条记录在文件里的偏移，index 是通过一个循环得出这是“第几条”记录，三条 id 在文件里的偏移我们知道，分别是：0,32,64，由此，index * sizeof(struct Rec)  可直接等到偏移值；
+本题中，id 和「第几条」是同一件事；如果记录不是按 id 排序的我的代码依旧正常运行，因为我的代码逻辑已经找到目标 id 是“第几条”记录，而不是直接使用 id 的值；
+
+任务二：
+这一题，其实我在上一题的第一个思路里就完成了一半；
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim textdb.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -Werror -o build/textdb textdb.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ ./build/textdb
+binary = 96
+binary = 40
+
+1.两种没有可比性，rec.bin 有 int、char[]、double 等类型的数据，而 rec.txt 里的文字都是 char 类型的数据；
+2.不知道，给我讲解；
