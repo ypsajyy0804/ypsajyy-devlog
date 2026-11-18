@@ -1,0 +1,44 @@
+定向学习：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/mk$ vim Makefile
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/mk$ make
+gcc -Wall -Wextra -Werror -o build/mkapp build/main.o build/util.o
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/mk$ make
+make: 'build/mkapp' is up to date.
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/mk$ vim util.h  // 加了一行空行
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/mk$ make
+gcc -Wall -Wextra -Werror -c main.c -o build/main.o
+gcc -Wall -Wextra -Werror -c util.c -o build/util.o
+gcc -Wall -Wextra -Werror -o build/mkapp build/main.o build/util.o
+
+1.比的大概是文件修改时间，时间变了它就检测到文件更新了，没变就没更新
+2.因为两个 .o 文件的编译都依赖项目头文件 .h，.h 更新了两个文件就会重编；第三步 main.o 不会重编，没有“gcc -Wall -Wextra -Werror -c main.c -o build/main.o”这一条；
+3.我没有理解为什么“没有命令产出叫 build 的文件”与“build 比 .o 旧”和“重新执行它”之间有什么关系？我还没有搞明白 make 的底层逻辑。
+
+任务一：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/recdb_proj$ make
+gcc -Wall -Wextra -Werror -c recdb.c -o build/recdb.o
+gcc -Wall -Wextra -Werror -c main.c -o build/main.o
+gcc -Wall -Wextra -Werror -o build/recdb build/recdb.o build/main.o
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/recdb_proj$ ./build/recdb rec.bin write
+写入 3 条数据
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/recdb_proj$ ./build/recdb rec.bin show
+id=1 name=alice score=90.50
+id=2 name=bob score=85.00
+id=3 name=carol score=77.25
+返回 3 条数据
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/recdb_proj$ ./build/recdb rec.bin patch 2 99.00
+成功修改
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/recdb_proj$ ./build/recdb rec.bin show
+id=1 name=alice score=90.50
+id=2 name=bob score=99.00
+id=3 name=carol score=77.25
+返回 3 条数据
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c/recdb_proj$ make clean && make
+rm -rf build
+mkdir -p build
+gcc -Wall -Wextra -Werror -c recdb.c -o build/recdb.o
+gcc -Wall -Wextra -Werror -c main.c -o build/main.o
+gcc -Wall -Wextra -Werror -o build/recdb build/recdb.o build/main.o
+
+我直接手写重新实现了一遍，总提的逻辑完全没有问题，打印的偏差没有意义，忽略
+

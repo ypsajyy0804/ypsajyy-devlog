@@ -5,4 +5,10 @@ $() = 把变量拿出来用
 
 $<：第一个依赖
 
+$^：所有依赖项
+
 $@：当前目标
+|：build/main.o: main.c util.h | build
+                                			↑
+                          	 竖线后面这些，不参与时间比较
+竖线后面的叫 order-only prerequisite（只讲顺序的依赖）
