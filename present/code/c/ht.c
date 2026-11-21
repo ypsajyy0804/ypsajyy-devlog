@@ -161,12 +161,8 @@ int ht_del(HT *h, const char *key) {
 	if(strcmp(key, head->key) == 0) {
 		h->buckets[num] = head->next;
 
-		Node *temp = head;
-
-		head = h->buckets[num];
-
-		free(temp->key);
-		free(temp);
+		free(head->key);
+		free(head);
 
 		h->size--;
 
@@ -192,6 +188,41 @@ int ht_del(HT *h, const char *key) {
 		cur = prev->next;
 	}
 	return 0;
+}
+
+unsigned hash_val(const char *key, unsigned bucket_count) {
+	int sum = 0;
+	for(const char *p = key; *p != '\0'; ++p) sum += *p;
+	unsigned num = sum % bucket_count;
+
+	return num;
+}
+
+int ht_resize(HT *h, unsigned new_count) {
+	if(h == NULL || new_count == 0 || new_count <= h->bucket_count) return 0;
+
+	Node **new_buckets = calloc(new_count, sizeof(Node*));
+	if(new_buckets == NULL) return 0;
+
+	for(unsigned i = 0; i < h->bucket_count; i++) {
+		Node *node = h->buckets[i];
+
+		while(node != NULL){
+			unsigned num = hash_val(node->key, new_count);
+
+			//往新桶里迁入值
+			Node *cur = node;
+			node = node->next;
+			cur->next = new_buckets[num];
+			new_buckets[num] = cur;
+		}
+	}
+
+	free(h->buckets);
+	h->buckets = new_buckets;
+	h->bucket_count = new_count;
+
+	return 1;
 }
 
 int main() {
@@ -222,6 +253,21 @@ int main() {
 	printf("%d/10 ok\n", count);
 
 	if(ht_get(h, "eleven", &out) == 0) printf("eleven: not found\n");
+
+	printf("resize 8 -> 16 = %d\n", ht_resize(h, 16));
+	count = 0;
+	for (int i = 0; i < 10; i++)
+	    if (ht_get(h, k[i], &out) == 1 && out == want[i]) count++;
+	printf("%d/10 after resize\n", count);
+
+	printf("resize 16 -> 64 = %d\n", ht_resize(h, 64));
+	count = 0;
+	for (int i = 0; i < 10; i++)
+	    if (ht_get(h, k[i], &out) == 1 && out == want[i]) count++;
+	printf("%d/10 after resize again\n", count);
+
+	printf("resize 64 -> 64 = %d\n", ht_resize(h, 64));
+	printf("resize 64 -> 8 = %d\n", ht_resize(h, 8));
 
 	printf("put three again = %d\n", ht_put(h, "three", 99));
 
