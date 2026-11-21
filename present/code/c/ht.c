@@ -146,6 +146,54 @@ unsigned ht_count(const HT *h){
 	return h->size;
 }
 
+int ht_del(HT *h, const char *key) {
+	int sum = 0;
+	for(const char *p = key; *p != '\0'; p++) {
+		sum += *p;
+	}
+
+	unsigned num = sum % h->bucket_count;
+
+	Node *head = h->buckets[num];
+
+	if(head == NULL) return 0;
+
+	if(strcmp(key, head->key) == 0) {
+		h->buckets[num] = head->next;
+
+		Node *temp = head;
+
+		head = h->buckets[num];
+
+		free(temp->key);
+		free(temp);
+
+		h->size--;
+
+		return 1;
+	}
+
+	Node *prev = head;
+
+	Node *cur = prev->next;
+
+	while(cur != NULL) {
+		if(strcmp(key, cur->key) == 0) {
+			prev->next = cur->next;
+
+			free(cur->key);
+			free(cur);
+
+			h->size--;
+
+			return 1;
+		}
+		prev = cur;
+		cur = prev->next;
+	}
+	return 0;
+}
+
 int main() {
 	HT *h = ht_create(8);
 
@@ -179,6 +227,18 @@ int main() {
 
 	ht_get(h, "three", &out);
 	printf("three = %d, count = %u\n", out, ht_count(h));
+
+	printf("del one = %d\n", ht_del(h, "one"));
+	printf("del one again = %d\n", ht_del(h, "one"));
+	printf("del nope = %d\n", ht_del(h, "nope"));
+	printf("count = %u\n", ht_count(h));
+
+	/* 把剩下的全删掉 */
+	const char *rest[9] = {"two","three","four","five","six","seven","eight","nine","ten"};
+	for (int i = 0; i < 9; i++) ht_del(h, rest[i]);
+	printf("after delete all: count = %u\n", ht_count(h));
+
+	printf("del one after empty = %d\n", ht_del(h, "one"));
 
 	ht_free(h);
 

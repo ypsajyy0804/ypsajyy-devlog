@@ -1,0 +1,56 @@
+定向学习：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -o build/del_head del_head.c && ./build/del_head
+main 里的 a 指向: 1
+
+1.改了传入 del_head() a 节点指针的副本；副本的改动不会影响原来的 a;
+2.参数应该改为二级指针 void del_head(N **head)；
+其实保持原参数，还有另外一种的改法，也是之前练习链表时的写法：使函数的返回值的为 Node *，把修改好的副本节点指针传回给 main 函数中并赋值给原节点指针 a；
+3.不需要；前一个节点的 next 节点指向需要删除的节点的 next 节点；
+
+任务1：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ vim ht.c
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ gcc -Wall -Wextra -o build/ht ht.c && ./build/ht
+10/10 ok
+eleven: not found
+put three again = 0
+three = 99, count = 10
+del one = 1
+del one again = 0
+del nope = 0
+count = 9
+after delete all: count = 0
+
+1.两块；一是删除节点的 key，一是节点本身；
+2.两条；
+if(strcmp(key, head->key) == 0)
+分界是判断头节点的 key 与 传入的 key 是否相同；
+
+任务二：
+ypsajyy@LAPTOP-UA13PBC7:/mnt/d/Claude_code/devlog/present/code/c$ valgrind --leak-check=full ./build/ht
+==274== Memcheck, a memory error detector
+==274== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==274== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==274== Command: ./build/ht
+==274==
+10/10 ok
+eleven: not found
+put three again = 0
+three = 99, count = 10
+del one = 1
+del one again = 0
+del nope = 0
+count = 9
+after delete all: count = 0
+del one after empty = 0
+==274==
+==274== HEAP SUMMARY:
+==274==     in use at exit: 0 bytes in 0 blocks
+==274==   total heap usage: 23 allocs, 23 frees, 1,393 bytes allocated
+==274==
+==274== All heap blocks were freed -- no leaks are possible
+==274==
+==274== For lists of detected and suppressed errors, rerun with: -s
+==274== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+1.total heap usage: 23 allocs, 23 frees, 1,393 bytes allocated
+都是 23 次，每分配的一块内存都需要释放一次确保内存无泄漏，所以两个数相等
